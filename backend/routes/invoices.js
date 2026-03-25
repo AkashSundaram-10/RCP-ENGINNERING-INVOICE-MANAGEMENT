@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getDb, getNextInvoiceNumber, saveDatabase, getAll, getOne, insert } = require('../db/database');
+const { getNextInvoiceNumber, getAll, getOne, insert, runQuery } = require('../db/database');
 
 // GET all invoices with customer details
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const invoices = getAll(`
+    const invoices = await getAll(`
       SELECT
         i.*,
         c.name as customer_name,
@@ -24,24 +24,21 @@ router.get('/', (req, res) => {
 });
 
 // GET monthly analytics data (must be before /:id)
-router.get('/analytics/monthly', (req, res) => {
+router.get('/analytics/monthly', async (req, res) => {
   try {
-    const db = getDb();
-
-    // Query to get monthly revenue data
-    const result = db.exec(`
+    const result = await getAll(`
       SELECT
-        SUBSTR(date, 7, 4) || '-' || SUBSTR(date, 4, 2) as month_key,
+        TO_CHAR(TO_DATE(date, 'DD-MM-YYYY'), 'YYYY-MM') as month_key,
         SUM(grand_total) as total_revenue,
         SUM(CASE WHEN payment_status = 'paid' THEN grand_total ELSE 0 END) as paid_amount,
         SUM(CASE WHEN payment_status = 'pending' THEN grand_total ELSE 0 END) as pending_amount,
         COUNT(*) as invoice_count
       FROM invoices
-      GROUP BY month_key
-      ORDER BY month_key ASC
+      GROUP BY TO_CHAR(TO_DATE(date, 'DD-MM-YYYY'), 'YYYY-MM')
+      ORDER BY TO_CHAR(TO_DATE(date, 'DD-MM-YYYY'), 'YYYY-MM') ASC
     `);
 
-    if (result.length === 0 || result[0].values.length === 0) {
+    if (result.length === 0) {
       return res.json({
         months: [],
         revenue: [],
@@ -51,9 +48,6 @@ router.get('/analytics/monthly', (req, res) => {
       });
     }
 
-    const columns = result[0].columns;
-    const rows = result[0].values;
-
     // Format months and build response
     const months = [];
     const revenue = [];
@@ -61,22 +55,17 @@ router.get('/analytics/monthly', (req, res) => {
     const pending = [];
     const invoiceCount = [];
 
-    rows.forEach(row => {
-      const obj = {};
-      columns.forEach((col, idx) => {
-        obj[col] = row[idx];
-      });
-
+    result.forEach(row => {
       // Parse month_key (YYYY-MM) and format as "Mon YYYY"
-      const [year, month] = obj.month_key.split('-');
+      const [year, month] = row.month_key.split('-');
       const monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const monthLabel = monthNames[parseInt(month)] + ' ' + year;
 
       months.push(monthLabel);
-      revenue.push(Math.round(obj.total_revenue * 100) / 100);
-      paid.push(Math.round(obj.paid_amount * 100) / 100);
-      pending.push(Math.round(obj.pending_amount * 100) / 100);
-      invoiceCount.push(obj.invoice_count);
+      revenue.push(Math.round(parseFloat(row.total_revenue) * 100) / 100);
+      paid.push(Math.round(parseFloat(row.paid_amount) * 100) / 100);
+      pending.push(Math.round(parseFloat(row.pending_amount) * 100) / 100);
+      invoiceCount.push(parseInt(row.invoice_count));
     });
 
     res.json({
@@ -92,9 +81,9 @@ router.get('/analytics/monthly', (req, res) => {
 });
 
 // GET next invoice number
-router.get('/next-number', (req, res) => {
+router.get('/next-number', async (req, res) => {
   try {
-    const nextNumber = getNextInvoiceNumber();
+    const nextNumber = await getNextInvoiceNumber();
     res.json({ invoice_no: nextNumber });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -102,10 +91,9 @@ router.get('/next-number', (req, res) => {
 });
 
 // GET single invoice by ID with items
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const db = getDb();
-    const invoiceResult = db.exec(`
+    const invoice = await getOne(`
       SELECT
         i.*,
         c.name as customer_name,
@@ -115,36 +103,17 @@ router.get('/:id', (req, res) => {
         c.email as customer_email
       FROM invoices i
       LEFT JOIN customers c ON i.customer_id = c.id
-      WHERE i.id = ${req.params.id}
-    `);
+      WHERE i.id = $1
+    `, [req.params.id]);
 
-    if (invoiceResult.length === 0 || invoiceResult[0].values.length === 0) {
+    if (!invoice) {
       return res.status(404).json({ error: 'Invoice not found' });
     }
 
-    const columns = invoiceResult[0].columns;
-    const values = invoiceResult[0].values[0];
-    const invoice = {};
-    columns.forEach((col, idx) => {
-      invoice[col] = values[idx];
-    });
-
     // Get items
-    const itemsResult = db.exec(`
-      SELECT * FROM invoice_items WHERE invoice_id = ${req.params.id}
-    `);
-
-    let items = [];
-    if (itemsResult.length > 0) {
-      const itemCols = itemsResult[0].columns;
-      items = itemsResult[0].values.map(row => {
-        const obj = {};
-        itemCols.forEach((col, idx) => {
-          obj[col] = row[idx];
-        });
-        return obj;
-      });
-    }
+    const items = await getAll(`
+      SELECT * FROM invoice_items WHERE invoice_id = $1
+    `, [req.params.id]);
 
     res.json({ ...invoice, items });
   } catch (error) {
@@ -153,42 +122,39 @@ router.get('/:id', (req, res) => {
 });
 
 // POST create new invoice with items
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { invoice_no, date, customer_id, items, notes } = req.body;
 
   try {
-    const db = getDb();
-
     // Calculate totals
     let subtotal = 0;
-    items.forEach(item => {
-      subtotal += item.qty * item.rate;
-    });
+    if (items && Array.isArray(items)) {
+      items.forEach(item => {
+        subtotal += item.qty * item.rate;
+      });
+    }
 
     const sgst = subtotal * 0.09; // 9% SGST
     const cgst = subtotal * 0.09; // 9% CGST
     const grand_total = subtotal + sgst + cgst;
 
     // Insert invoice
-    db.run(`
+    const invoiceId = await insert(`
       INSERT INTO invoices (invoice_no, date, customer_id, subtotal, sgst, cgst, grand_total, notes)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, [invoice_no, date, customer_id, subtotal, sgst, cgst, grand_total, notes || '']);
-
-    // Get last insert ID
-    const idResult = db.exec('SELECT last_insert_rowid() as id');
-    const invoiceId = idResult[0].values[0][0];
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id
+    `, [invoice_no, date, customer_id || null, subtotal, sgst, cgst, grand_total, notes || '']);
 
     // Insert items
-    items.forEach(item => {
-      const amount = item.qty * item.rate;
-      db.run(`
-        INSERT INTO invoice_items (invoice_id, description, hsn_code, qty, rate, amount)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `, [invoiceId, item.description, item.hsn_code, item.qty, item.rate, amount]);
-    });
-
-    saveDatabase();
+    if (items && Array.isArray(items)) {
+      for (const item of items) {
+        const amount = item.qty * item.rate;
+        await runQuery(`
+          INSERT INTO invoice_items (invoice_id, description, hsn_code, qty, rate, amount)
+          VALUES ($1, $2, $3, $4, $5, $6)
+        `, [invoiceId, item.description, item.hsn_code || null, item.qty, item.rate, amount]);
+      }
+    }
 
     res.status(201).json({
       id: invoiceId,
@@ -201,15 +167,13 @@ router.post('/', (req, res) => {
 });
 
 // PUT update invoice
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   const { date, customer_id, items, notes, payment_status } = req.body;
 
   try {
-    const db = getDb();
-
     // Calculate totals
     let subtotal = 0;
-    if (items) {
+    if (items && Array.isArray(items)) {
       items.forEach(item => {
         subtotal += item.qty * item.rate;
       });
@@ -220,27 +184,25 @@ router.put('/:id', (req, res) => {
     const grand_total = subtotal + sgst + cgst;
 
     // Update invoice
-    db.run(`
+    await runQuery(`
       UPDATE invoices
-      SET date = ?, customer_id = ?, subtotal = ?, sgst = ?, cgst = ?,
-          grand_total = ?, notes = ?, payment_status = ?
-      WHERE id = ?
-    `, [date, customer_id, subtotal, sgst, cgst, grand_total, notes || '', payment_status, req.params.id]);
+      SET date = $1, customer_id = $2, subtotal = $3, sgst = $4, cgst = $5,
+          grand_total = $6, notes = $7, payment_status = $8
+      WHERE id = $9
+    `, [date, customer_id || null, subtotal, sgst, cgst, grand_total, notes || '', payment_status || 'pending', req.params.id]);
 
     // Delete old items and insert new ones
-    if (items) {
-      db.run('DELETE FROM invoice_items WHERE invoice_id = ?', [req.params.id]);
+    if (items && Array.isArray(items)) {
+      await runQuery('DELETE FROM invoice_items WHERE invoice_id = $1', [req.params.id]);
 
-      items.forEach(item => {
+      for (const item of items) {
         const amount = item.qty * item.rate;
-        db.run(`
+        await runQuery(`
           INSERT INTO invoice_items (invoice_id, description, hsn_code, qty, rate, amount)
-          VALUES (?, ?, ?, ?, ?, ?)
-        `, [req.params.id, item.description, item.hsn_code, item.qty, item.rate, amount]);
-      });
+          VALUES ($1, $2, $3, $4, $5, $6)
+        `, [req.params.id, item.description, item.hsn_code || null, item.qty, item.rate, amount]);
+      }
     }
-
-    saveDatabase();
 
     res.json({ message: 'Invoice updated successfully' });
   } catch (error) {
@@ -249,14 +211,11 @@ router.put('/:id', (req, res) => {
 });
 
 // PATCH update payment status only
-router.patch('/:id/status', (req, res) => {
+router.patch('/:id/status', async (req, res) => {
   const { payment_status } = req.body;
 
   try {
-    const db = getDb();
-    db.run(`UPDATE invoices SET payment_status = ? WHERE id = ?`, [payment_status, req.params.id]);
-    saveDatabase();
-
+    await runQuery(`UPDATE invoices SET payment_status = $1 WHERE id = $2`, [payment_status, req.params.id]);
     res.json({ message: 'Payment status updated' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -264,16 +223,12 @@ router.patch('/:id/status', (req, res) => {
 });
 
 // DELETE invoice
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    const db = getDb();
-
-    // Delete items first
-    db.run('DELETE FROM invoice_items WHERE invoice_id = ?', [req.params.id]);
+    // Delete items first (cascade handled by DB but explicit is clearer)
+    await runQuery('DELETE FROM invoice_items WHERE invoice_id = $1', [req.params.id]);
     // Delete invoice
-    db.run('DELETE FROM invoices WHERE id = ?', [req.params.id]);
-
-    saveDatabase();
+    await runQuery('DELETE FROM invoices WHERE id = $1', [req.params.id]);
 
     res.json({ message: 'Invoice deleted successfully' });
   } catch (error) {

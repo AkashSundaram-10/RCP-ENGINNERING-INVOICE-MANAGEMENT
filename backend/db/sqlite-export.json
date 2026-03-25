@@ -1,0 +1,2043 @@
+{
+  "timestamp": "2026-03-25T14:13:02.707Z",
+  "source": "SQLite (sql.js)",
+  "tables": {
+    "customers": {
+      "count": 11,
+      "data": [
+        {
+          "id": 1,
+          "name": "EN EM INDUSTRIES",
+          "address": "17/54 Sukran Thottam, Udayampalayam, Ganapathy, Chinnavedampatti, Coimbatore – 641006",
+          "gstin": "33BQQPS9236R1ZN",
+          "phone": null,
+          "email": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 2,
+          "name": "NEW MARKETRONIKA",
+          "address": "23/A-1 Lakshmipuram, Ganapathy, Coimbatore – 641006",
+          "gstin": "33AADFN5720D1ZS",
+          "phone": null,
+          "email": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 3,
+          "name": "Orange Sorting Machines India Pvt Ltd",
+          "address": "SF No.62/1, Atthipalayam Road, Chinnavedampatti, Coimbatore – 641049",
+          "gstin": "33AAACO7124L1ZH",
+          "phone": null,
+          "email": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 4,
+          "name": "KPS INDUSTRIES",
+          "address": "SF No 45, Athipalayam Road, Chinnavedampatti, Coimbatore – 641006",
+          "gstin": "33BZZPM2421C1ZG",
+          "phone": null,
+          "email": null,
+          "created_at": "2026-03-24 11:12:45"
+        },
+        {
+          "id": 5,
+          "name": "Sky Industrial Components",
+          "address": "No 6, Vadakku Thottam, Park Town, Udayampalayam, Chinnavedampatti, Coimbatore – 641049",
+          "gstin": "33BGZPS2543C1Z6",
+          "phone": null,
+          "email": null,
+          "created_at": "2026-03-24 11:12:45"
+        },
+        {
+          "id": 6,
+          "name": "MANJURIYA FURNITURE AGENCIES",
+          "address": "2B2 Pudhupalayam Road, Maniyakarampalayam, Idikarai, Coimbatore – 641022",
+          "gstin": "33AHRPN8185H1ZG",
+          "phone": null,
+          "email": null,
+          "created_at": "2026-03-24 11:16:05"
+        },
+        {
+          "id": 7,
+          "name": "ARM AGENCIES",
+          "address": "No. 546/2, Subbammal Nagar, Rajiv Gandhi Salai, Maniyakaranpalayam, Coimbatore cbe 641006",
+          "gstin": "33NRFPS0721D1ZX",
+          "phone": "",
+          "email": "",
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 8,
+          "name": "K.S UNION",
+          "address": "No. 1858/2, BKS Compound, BM Road, Yarabb Nagar, Division DGSTO-2, Channapatna, Ramanagara, Karnataka – 562160",
+          "gstin": "29GXZPS3735Q1ZU",
+          "phone": "",
+          "email": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 9,
+          "name": "GURU DHIYA FURNITURE",
+          "address": "SF No:57, Rottikaarar Thottam, Edayarpalayam Road, Vadavalli, Coimbatore – 641041",
+          "gstin": "33HKBPK4416C1ZN",
+          "phone": "",
+          "email": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 10,
+          "name": "HIMALAYA TIMBERS AND CRAFTS",
+          "address": "   49/2,Vivekanandha Street,Urumandapalayam,Nanjegounden,Pudur,Coimbatore -641029.",
+          "gstin": "33HKBPK4416C1ZN",
+          "phone": "",
+          "email": "",
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 11,
+          "name": " Sky Industrial Components",
+          "address": "No : 6  ,Vadakku Thottam ,Park Town,Udayampalayam,Chinnavedampatti(Post) CBE- 641049",
+          "gstin": "3\t3\tB\tG\tZ\tP\tS\t2\t5\t4\t3\tC\t1\tZ\t6",
+          "phone": "",
+          "email": "",
+          "created_at": "2026-03-24 12:01:14"
+        }
+      ]
+    },
+    "invoices": {
+      "count": 51,
+      "data": [
+        {
+          "id": 1,
+          "invoice_no": "001",
+          "date": "02-07-2025",
+          "customer_id": 1,
+          "subtotal": 19300,
+          "sgst": 1737,
+          "cgst": 1737,
+          "grand_total": 22774,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 2,
+          "invoice_no": "002",
+          "date": "15-07-2025",
+          "customer_id": 1,
+          "subtotal": 23500,
+          "sgst": 1410,
+          "cgst": 1410,
+          "grand_total": 26320,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 3,
+          "invoice_no": "003",
+          "date": "14-07-2025",
+          "customer_id": 2,
+          "subtotal": 6320,
+          "sgst": 569,
+          "cgst": 569,
+          "grand_total": 7458,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 4,
+          "invoice_no": "004",
+          "date": "17-07-2025",
+          "customer_id": 3,
+          "subtotal": 1500,
+          "sgst": 135,
+          "cgst": 135,
+          "grand_total": 1770,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 5,
+          "invoice_no": "005",
+          "date": "17-07-2025",
+          "customer_id": 3,
+          "subtotal": 350,
+          "sgst": 21,
+          "cgst": 21,
+          "grand_total": 392,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 6,
+          "invoice_no": "006",
+          "date": "22-07-2025",
+          "customer_id": 1,
+          "subtotal": 12000,
+          "sgst": 1080,
+          "cgst": 1080,
+          "grand_total": 14160,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 7,
+          "invoice_no": "007",
+          "date": "22-07-2025",
+          "customer_id": 1,
+          "subtotal": 6500,
+          "sgst": 390,
+          "cgst": 390,
+          "grand_total": 7280,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 8,
+          "invoice_no": "008",
+          "date": "11-08-2025",
+          "customer_id": 1,
+          "subtotal": 8500,
+          "sgst": 765,
+          "cgst": 765,
+          "grand_total": 10030,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 9,
+          "invoice_no": "009",
+          "date": "11-08-2025",
+          "customer_id": 1,
+          "subtotal": 2700,
+          "sgst": 162,
+          "cgst": 162,
+          "grand_total": 3024,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 10,
+          "invoice_no": "010",
+          "date": "16-08-2025",
+          "customer_id": 1,
+          "subtotal": 3500,
+          "sgst": 210,
+          "cgst": 210,
+          "grand_total": 3920,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 07:41:41"
+        },
+        {
+          "id": 11,
+          "invoice_no": "011",
+          "date": "20-08-2025",
+          "customer_id": 1,
+          "subtotal": 4500,
+          "sgst": 270,
+          "cgst": 270,
+          "grand_total": 5040,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:12:45"
+        },
+        {
+          "id": 12,
+          "invoice_no": "012",
+          "date": "21-08-2025",
+          "customer_id": 4,
+          "subtotal": 6000,
+          "sgst": 360,
+          "cgst": 360,
+          "grand_total": 6720,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:12:45"
+        },
+        {
+          "id": 13,
+          "invoice_no": "013",
+          "date": "29-08-2025",
+          "customer_id": 1,
+          "subtotal": 6000,
+          "sgst": 360,
+          "cgst": 360,
+          "grand_total": 6720,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:12:45"
+        },
+        {
+          "id": 14,
+          "invoice_no": "014",
+          "date": "22-09-2025",
+          "customer_id": 1,
+          "subtotal": 9700,
+          "sgst": 873,
+          "cgst": 873,
+          "grand_total": 11446,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:12:45"
+        },
+        {
+          "id": 15,
+          "invoice_no": "015",
+          "date": "29-09-2025",
+          "customer_id": 1,
+          "subtotal": 5050,
+          "sgst": 454,
+          "cgst": 454,
+          "grand_total": 5958,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:12:45"
+        },
+        {
+          "id": 16,
+          "invoice_no": "017",
+          "date": "13-10-2025",
+          "customer_id": 5,
+          "subtotal": 10000,
+          "sgst": 900,
+          "cgst": 900,
+          "grand_total": 11800,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:12:45"
+        },
+        {
+          "id": 17,
+          "invoice_no": "018",
+          "date": "14-10-2025",
+          "customer_id": 2,
+          "subtotal": 18000,
+          "sgst": 1620,
+          "cgst": 1620,
+          "grand_total": 21240,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:12:45"
+        },
+        {
+          "id": 18,
+          "invoice_no": "019",
+          "date": "15-10-2025",
+          "customer_id": 5,
+          "subtotal": 12700,
+          "sgst": 1143,
+          "cgst": 1143,
+          "grand_total": 14986,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:12:45"
+        },
+        {
+          "id": 19,
+          "invoice_no": "020",
+          "date": "01-11-2025",
+          "customer_id": 1,
+          "subtotal": 7900,
+          "sgst": 711,
+          "cgst": 711,
+          "grand_total": 9322,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:12:45"
+        },
+        {
+          "id": 20,
+          "invoice_no": "021",
+          "date": "11-11-2025",
+          "customer_id": 5,
+          "subtotal": 3500,
+          "sgst": 315,
+          "cgst": 315,
+          "grand_total": 4130,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:16:05"
+        },
+        {
+          "id": 21,
+          "invoice_no": "022",
+          "date": "12-11-2025",
+          "customer_id": 1,
+          "subtotal": 4500,
+          "sgst": 405,
+          "cgst": 405,
+          "grand_total": 5310,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:16:05"
+        },
+        {
+          "id": 22,
+          "invoice_no": "023",
+          "date": "19-11-2025",
+          "customer_id": 6,
+          "subtotal": 11000,
+          "sgst": 990,
+          "cgst": 990,
+          "grand_total": 12980,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:16:05"
+        },
+        {
+          "id": 23,
+          "invoice_no": "024",
+          "date": "19-11-2025",
+          "customer_id": 1,
+          "subtotal": 12975,
+          "sgst": 1168,
+          "cgst": 1168,
+          "grand_total": 15310,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:16:05"
+        },
+        {
+          "id": 24,
+          "invoice_no": "025",
+          "date": "12-12-2025",
+          "customer_id": 1,
+          "subtotal": 17450,
+          "sgst": 1571,
+          "cgst": 1571,
+          "grand_total": 20592,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:16:05"
+        },
+        {
+          "id": 25,
+          "invoice_no": "026",
+          "date": "16-12-2025",
+          "customer_id": 5,
+          "subtotal": 10800,
+          "sgst": 972,
+          "cgst": 972,
+          "grand_total": 12744,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:16:05"
+        },
+        {
+          "id": 26,
+          "invoice_no": "027",
+          "date": "20-12-2025",
+          "customer_id": 5,
+          "subtotal": 1760,
+          "sgst": 158,
+          "cgst": 158,
+          "grand_total": 2076,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:16:05"
+        },
+        {
+          "id": 27,
+          "invoice_no": "028",
+          "date": "27-12-2025",
+          "customer_id": 5,
+          "subtotal": 15500,
+          "sgst": 1395,
+          "cgst": 1395,
+          "grand_total": 18290,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:16:05"
+        },
+        {
+          "id": 28,
+          "invoice_no": "029",
+          "date": "29-12-2025",
+          "customer_id": 5,
+          "subtotal": 9000,
+          "sgst": 810,
+          "cgst": 810,
+          "grand_total": 10620,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:16:05"
+        },
+        {
+          "id": 51,
+          "invoice_no": "030",
+          "date": "30-12-2025",
+          "customer_id": 1,
+          "subtotal": 11100,
+          "sgst": 999,
+          "cgst": 999,
+          "grand_total": 13098,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 52,
+          "invoice_no": "031",
+          "date": "05-01-2026",
+          "customer_id": 7,
+          "subtotal": 8400,
+          "sgst": 756,
+          "cgst": 756,
+          "grand_total": 9912,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 53,
+          "invoice_no": "032",
+          "date": "05-01-2026",
+          "customer_id": 8,
+          "subtotal": 1000,
+          "sgst": 90,
+          "cgst": 90,
+          "grand_total": 1180,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 54,
+          "invoice_no": "033",
+          "date": "21-01-2026",
+          "customer_id": 5,
+          "subtotal": 12000,
+          "sgst": 1080,
+          "cgst": 1080,
+          "grand_total": 14160,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 55,
+          "invoice_no": "034",
+          "date": "25-01-2026",
+          "customer_id": 7,
+          "subtotal": 7000,
+          "sgst": 630,
+          "cgst": 630,
+          "grand_total": 8260,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 56,
+          "invoice_no": "035",
+          "date": "25-01-2026",
+          "customer_id": 6,
+          "subtotal": 8050,
+          "sgst": 725,
+          "cgst": 725,
+          "grand_total": 9450,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 57,
+          "invoice_no": "036",
+          "date": "25-01-2026",
+          "customer_id": 5,
+          "subtotal": 4518,
+          "sgst": 407,
+          "cgst": 407,
+          "grand_total": 5332,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 58,
+          "invoice_no": "037",
+          "date": "30-01-2026",
+          "customer_id": 5,
+          "subtotal": 2250,
+          "sgst": 202,
+          "cgst": 202,
+          "grand_total": 2654,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 59,
+          "invoice_no": "038",
+          "date": "05-02-2026",
+          "customer_id": 9,
+          "subtotal": 30000,
+          "sgst": 2700,
+          "cgst": 2700,
+          "grand_total": 35400,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 60,
+          "invoice_no": "039",
+          "date": "07-02-2026",
+          "customer_id": 5,
+          "subtotal": 7060,
+          "sgst": 635,
+          "cgst": 635,
+          "grand_total": 8330,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 61,
+          "invoice_no": "040",
+          "date": "09-02-2026",
+          "customer_id": 5,
+          "subtotal": 8500,
+          "sgst": 765,
+          "cgst": 765,
+          "grand_total": 10030,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 62,
+          "invoice_no": "041",
+          "date": "11-02-2026",
+          "customer_id": 5,
+          "subtotal": 6100,
+          "sgst": 550,
+          "cgst": 550,
+          "grand_total": 7200,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 63,
+          "invoice_no": "042",
+          "date": "13-02-2026",
+          "customer_id": 5,
+          "subtotal": 2520,
+          "sgst": 227,
+          "cgst": 227,
+          "grand_total": 2974,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 64,
+          "invoice_no": "043",
+          "date": "15-02-2026",
+          "customer_id": 10,
+          "subtotal": 43050,
+          "sgst": 3874,
+          "cgst": 3874,
+          "grand_total": 50798,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 65,
+          "invoice_no": "044",
+          "date": "23-02-2026",
+          "customer_id": 5,
+          "subtotal": 13360,
+          "sgst": 1202,
+          "cgst": 1202,
+          "grand_total": 15764,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 66,
+          "invoice_no": "045",
+          "date": "26-02-2026",
+          "customer_id": 1,
+          "subtotal": 7780,
+          "sgst": 700,
+          "cgst": 700,
+          "grand_total": 9180,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 67,
+          "invoice_no": "046",
+          "date": "28-02-2026",
+          "customer_id": 5,
+          "subtotal": 16005,
+          "sgst": 1440,
+          "cgst": 1440,
+          "grand_total": 18885,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 68,
+          "invoice_no": "047",
+          "date": "06-03-2026",
+          "customer_id": 5,
+          "subtotal": 6713,
+          "sgst": 604,
+          "cgst": 604,
+          "grand_total": 7921,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 69,
+          "invoice_no": "048",
+          "date": "12-03-2026",
+          "customer_id": 5,
+          "subtotal": 17385,
+          "sgst": 1565,
+          "cgst": 1565,
+          "grand_total": 20515,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 70,
+          "invoice_no": "049",
+          "date": "19-03-2026",
+          "customer_id": 2,
+          "subtotal": 25000,
+          "sgst": 2250,
+          "cgst": 2250,
+          "grand_total": 29500,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 71,
+          "invoice_no": "050",
+          "date": "21-03-2026",
+          "customer_id": 1,
+          "subtotal": 12600,
+          "sgst": 1134,
+          "cgst": 1134,
+          "grand_total": 14868,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 72,
+          "invoice_no": "051",
+          "date": "21-03-2026",
+          "customer_id": 5,
+          "subtotal": 12085,
+          "sgst": 1088,
+          "cgst": 1088,
+          "grand_total": 14261,
+          "payment_status": "paid",
+          "notes": null,
+          "created_at": "2026-03-24 11:46:45"
+        },
+        {
+          "id": 73,
+          "invoice_no": "052",
+          "date": "23-03-2026",
+          "customer_id": 11,
+          "subtotal": 4600,
+          "sgst": 414,
+          "cgst": 414,
+          "grand_total": 5428,
+          "payment_status": "paid",
+          "notes": "",
+          "created_at": "2026-03-24 12:01:14"
+        }
+      ]
+    },
+    "invoice_items": {
+      "count": 140,
+      "data": [
+        {
+          "id": 1,
+          "invoice_id": 1,
+          "description": "Stone Drill Fixture Ø16 hole",
+          "hsn_code": "8466",
+          "qty": 1,
+          "rate": 6500,
+          "amount": 6500
+        },
+        {
+          "id": 2,
+          "invoice_id": 1,
+          "description": "Stone Drill Fixture Ø6 hole",
+          "hsn_code": "8466",
+          "qty": 1,
+          "rate": 6500,
+          "amount": 6500
+        },
+        {
+          "id": 3,
+          "invoice_id": 1,
+          "description": "SS Flat Drill Fixture Ø6",
+          "hsn_code": "8466",
+          "qty": 1,
+          "rate": 4500,
+          "amount": 4500
+        },
+        {
+          "id": 4,
+          "invoice_id": 1,
+          "description": "Plastic Inspection Gauge",
+          "hsn_code": "9031",
+          "qty": 1,
+          "rate": 1800,
+          "amount": 1800
+        },
+        {
+          "id": 5,
+          "invoice_id": 2,
+          "description": "Cutting Machine Fixture",
+          "hsn_code": "8466",
+          "qty": 1,
+          "rate": 8500,
+          "amount": 8500
+        },
+        {
+          "id": 6,
+          "invoice_id": 2,
+          "description": "Cutting Machine Spindle Assembly Labour",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 6000,
+          "amount": 6000
+        },
+        {
+          "id": 7,
+          "invoice_id": 2,
+          "description": "Rough Tapper Spindle Assembly Labour",
+          "hsn_code": "8466",
+          "qty": 1,
+          "rate": 4000,
+          "amount": 4000
+        },
+        {
+          "id": 8,
+          "invoice_id": 2,
+          "description": "Lathe Attachment Spindle Work Labour",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 5000,
+          "amount": 5000
+        },
+        {
+          "id": 9,
+          "invoice_id": 3,
+          "description": "Brass ½ BSP Sensor Plug",
+          "hsn_code": "7415",
+          "qty": 10,
+          "rate": 600,
+          "amount": 6000
+        },
+        {
+          "id": 10,
+          "invoice_id": 3,
+          "description": "5mm Pin",
+          "hsn_code": "7415",
+          "qty": 4,
+          "rate": 80,
+          "amount": 320
+        },
+        {
+          "id": 11,
+          "invoice_id": 4,
+          "description": "MAC 63 Gear Box Shaft",
+          "hsn_code": "8483",
+          "qty": 1,
+          "rate": 1500,
+          "amount": 1500
+        },
+        {
+          "id": 12,
+          "invoice_id": 5,
+          "description": "V Pulley 6\" Bore & Keyway Work",
+          "hsn_code": "8483",
+          "qty": 1,
+          "rate": 350,
+          "amount": 350
+        },
+        {
+          "id": 13,
+          "invoice_id": 6,
+          "description": "Oil Lubrication Pump with Fitting Assembly",
+          "hsn_code": "8413",
+          "qty": 1,
+          "rate": 12000,
+          "amount": 12000
+        },
+        {
+          "id": 14,
+          "invoice_id": 7,
+          "description": "Rough Taper Motor Assembly",
+          "hsn_code": "8501",
+          "qty": 1,
+          "rate": 6500,
+          "amount": 6500
+        },
+        {
+          "id": 15,
+          "invoice_id": 8,
+          "description": "Pneumatic Press Fixture with Hose Valve & T Connector",
+          "hsn_code": "8412",
+          "qty": 1,
+          "rate": 8500,
+          "amount": 8500
+        },
+        {
+          "id": 16,
+          "invoice_id": 9,
+          "description": "SS Sheet Metal Work",
+          "hsn_code": "8501",
+          "qty": 1,
+          "rate": 1800,
+          "amount": 1800
+        },
+        {
+          "id": 17,
+          "invoice_id": 9,
+          "description": "TIG Welding Bracket",
+          "hsn_code": "",
+          "qty": 1,
+          "rate": 600,
+          "amount": 600
+        },
+        {
+          "id": 18,
+          "invoice_id": 9,
+          "description": "Additional Welding",
+          "hsn_code": "",
+          "qty": 1,
+          "rate": 300,
+          "amount": 300
+        },
+        {
+          "id": 19,
+          "invoice_id": 10,
+          "description": "Head Assembly TIG Welding Turning",
+          "hsn_code": "8501",
+          "qty": 1,
+          "rate": 3500,
+          "amount": 3500
+        },
+        {
+          "id": 20,
+          "invoice_id": 11,
+          "description": "SS Plates Drilling & Milling Works",
+          "hsn_code": "8458",
+          "qty": 50,
+          "rate": 90,
+          "amount": 4500
+        },
+        {
+          "id": 21,
+          "invoice_id": 12,
+          "description": "8mm Ball Radius Turning Works",
+          "hsn_code": "8458",
+          "qty": 200,
+          "rate": 30,
+          "amount": 6000
+        },
+        {
+          "id": 22,
+          "invoice_id": 13,
+          "description": "Carbide Bush",
+          "hsn_code": "8483",
+          "qty": 2,
+          "rate": 3000,
+          "amount": 6000
+        },
+        {
+          "id": 23,
+          "invoice_id": 14,
+          "description": "Lathe Drum Welding Work",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 800,
+          "amount": 800
+        },
+        {
+          "id": 24,
+          "invoice_id": 14,
+          "description": "Bearing Seal",
+          "hsn_code": "8482",
+          "qty": 1,
+          "rate": 1800,
+          "amount": 1800
+        },
+        {
+          "id": 25,
+          "invoice_id": 14,
+          "description": "Nylon Turning",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 200,
+          "amount": 200
+        },
+        {
+          "id": 26,
+          "invoice_id": 14,
+          "description": "SS Bush",
+          "hsn_code": "7326",
+          "qty": 1,
+          "rate": 200,
+          "amount": 200
+        },
+        {
+          "id": 27,
+          "invoice_id": 14,
+          "description": "Main Spindle Assembly",
+          "hsn_code": "8483",
+          "qty": 1,
+          "rate": 500,
+          "amount": 500
+        },
+        {
+          "id": 28,
+          "invoice_id": 14,
+          "description": "Paper Spindle Assembly",
+          "hsn_code": "8483",
+          "qty": 1,
+          "rate": 500,
+          "amount": 500
+        },
+        {
+          "id": 29,
+          "invoice_id": 14,
+          "description": "Cutter Removing Press Work",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 200,
+          "amount": 200
+        },
+        {
+          "id": 30,
+          "invoice_id": 14,
+          "description": "OD Hardening Metal Turning",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 500,
+          "amount": 500
+        },
+        {
+          "id": 31,
+          "invoice_id": 14,
+          "description": "Bush",
+          "hsn_code": "7326",
+          "qty": 1,
+          "rate": 200,
+          "amount": 200
+        },
+        {
+          "id": 32,
+          "invoice_id": 14,
+          "description": "Bush",
+          "hsn_code": "7326",
+          "qty": 1,
+          "rate": 200,
+          "amount": 200
+        },
+        {
+          "id": 33,
+          "invoice_id": 14,
+          "description": "SS Cup",
+          "hsn_code": "7326",
+          "qty": 1,
+          "rate": 200,
+          "amount": 200
+        },
+        {
+          "id": 34,
+          "invoice_id": 14,
+          "description": "Bearing",
+          "hsn_code": "8482",
+          "qty": 1,
+          "rate": 2400,
+          "amount": 2400
+        },
+        {
+          "id": 35,
+          "invoice_id": 14,
+          "description": "75 Square Rod",
+          "hsn_code": "7214",
+          "qty": 1,
+          "rate": 1500,
+          "amount": 1500
+        },
+        {
+          "id": 36,
+          "invoice_id": 14,
+          "description": "Bearing Plate",
+          "hsn_code": "7326",
+          "qty": 1,
+          "rate": 500,
+          "amount": 500
+        },
+        {
+          "id": 37,
+          "invoice_id": 15,
+          "description": "SS Blade Milling & Drilling Works",
+          "hsn_code": "8208",
+          "qty": 101,
+          "rate": 50,
+          "amount": 5050
+        },
+        {
+          "id": 38,
+          "invoice_id": 16,
+          "description": "Adaptor 180 Gauge",
+          "hsn_code": "9026",
+          "qty": 1,
+          "rate": 6000,
+          "amount": 6000
+        },
+        {
+          "id": 39,
+          "invoice_id": 16,
+          "description": "Thermal Valve Housing Gauge",
+          "hsn_code": "8481",
+          "qty": 1,
+          "rate": 4000,
+          "amount": 4000
+        },
+        {
+          "id": 40,
+          "invoice_id": 17,
+          "description": "Cutting Machine",
+          "hsn_code": "8461",
+          "qty": 1,
+          "rate": 18000,
+          "amount": 18000
+        },
+        {
+          "id": 41,
+          "invoice_id": 18,
+          "description": "Adaptor Plate Fixture",
+          "hsn_code": "8487",
+          "qty": 1,
+          "rate": 10500,
+          "amount": 10500
+        },
+        {
+          "id": 42,
+          "invoice_id": 18,
+          "description": "24.880 Bore Gauge",
+          "hsn_code": "9017",
+          "qty": 1,
+          "rate": 2200,
+          "amount": 2200
+        },
+        {
+          "id": 43,
+          "invoice_id": 19,
+          "description": "OD Spindle Assembly",
+          "hsn_code": "8483",
+          "qty": 1,
+          "rate": 500,
+          "amount": 500
+        },
+        {
+          "id": 44,
+          "invoice_id": 19,
+          "description": "Cutting Machine Rod",
+          "hsn_code": "8462",
+          "qty": 1,
+          "rate": 1500,
+          "amount": 1500
+        },
+        {
+          "id": 45,
+          "invoice_id": 19,
+          "description": "Pneumatic Bracket",
+          "hsn_code": "8412",
+          "qty": 1,
+          "rate": 1800,
+          "amount": 1800
+        },
+        {
+          "id": 46,
+          "invoice_id": 19,
+          "description": "Pneumatic Fixer Square",
+          "hsn_code": "8412",
+          "qty": 1,
+          "rate": 1000,
+          "amount": 1000
+        },
+        {
+          "id": 47,
+          "invoice_id": 19,
+          "description": "Bore",
+          "hsn_code": "9017",
+          "qty": 1,
+          "rate": 500,
+          "amount": 500
+        },
+        {
+          "id": 48,
+          "invoice_id": 19,
+          "description": "PCD Drill",
+          "hsn_code": "8207",
+          "qty": 1,
+          "rate": 200,
+          "amount": 200
+        },
+        {
+          "id": 49,
+          "invoice_id": 19,
+          "description": "Motor Plate",
+          "hsn_code": "8483",
+          "qty": 3,
+          "rate": 700,
+          "amount": 2100
+        },
+        {
+          "id": 50,
+          "invoice_id": 19,
+          "description": "Powder Coating",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 300,
+          "amount": 300
+        },
+        {
+          "id": 51,
+          "invoice_id": 20,
+          "description": "24.880 Gauge Wirecut & Grinding Work",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 800,
+          "amount": 800
+        },
+        {
+          "id": 52,
+          "invoice_id": 20,
+          "description": "Rough Milling Plate 155×40",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 300,
+          "amount": 300
+        },
+        {
+          "id": 53,
+          "invoice_id": 20,
+          "description": "Rough Milling Plate 705×40",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 1200,
+          "amount": 1200
+        },
+        {
+          "id": 54,
+          "invoice_id": 20,
+          "description": "Rough Milling Plate 350×40",
+          "hsn_code": "9988",
+          "qty": 2,
+          "rate": 600,
+          "amount": 1200
+        },
+        {
+          "id": 55,
+          "invoice_id": 21,
+          "description": "Rough Tapper Machine Lock Milling Labour",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 2500,
+          "amount": 2500
+        },
+        {
+          "id": 56,
+          "invoice_id": 21,
+          "description": "SS Sheet Door Labour Work",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 2000,
+          "amount": 2000
+        },
+        {
+          "id": 57,
+          "invoice_id": 22,
+          "description": "Mahogany Wood 5×1.5×7",
+          "hsn_code": "4407",
+          "qty": 25,
+          "rate": 350,
+          "amount": 8750
+        },
+        {
+          "id": 58,
+          "invoice_id": 22,
+          "description": "Mahogany Wood 4×1.5×7",
+          "hsn_code": "4407",
+          "qty": 10,
+          "rate": 225,
+          "amount": 2250
+        },
+        {
+          "id": 59,
+          "invoice_id": 23,
+          "description": "MS Bright Bar",
+          "hsn_code": "9988",
+          "qty": 2,
+          "rate": 353,
+          "amount": 706
+        },
+        {
+          "id": 60,
+          "invoice_id": 23,
+          "description": "EN8 Steel Round",
+          "hsn_code": "9988",
+          "qty": 2,
+          "rate": 353,
+          "amount": 706
+        },
+        {
+          "id": 61,
+          "invoice_id": 23,
+          "description": "MS Bright Bar",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 222,
+          "amount": 222
+        },
+        {
+          "id": 62,
+          "invoice_id": 23,
+          "description": "MS Bright Bar",
+          "hsn_code": "9988",
+          "qty": 2,
+          "rate": 305,
+          "amount": 610
+        },
+        {
+          "id": 63,
+          "invoice_id": 23,
+          "description": "MS Plate",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 1650,
+          "amount": 1650
+        },
+        {
+          "id": 64,
+          "invoice_id": 23,
+          "description": "MS Bright Bar",
+          "hsn_code": "9988",
+          "qty": 2,
+          "rate": 298,
+          "amount": 596
+        },
+        {
+          "id": 65,
+          "invoice_id": 23,
+          "description": "EN8 Steel Flat",
+          "hsn_code": "9988",
+          "qty": 2,
+          "rate": 485,
+          "amount": 970
+        },
+        {
+          "id": 66,
+          "invoice_id": 23,
+          "description": "6 Inch Pulley",
+          "hsn_code": "9988",
+          "qty": 4,
+          "rate": 450,
+          "amount": 1800
+        },
+        {
+          "id": 67,
+          "invoice_id": 23,
+          "description": "Timing Pulley Machining",
+          "hsn_code": "9988",
+          "qty": 4,
+          "rate": 1250,
+          "amount": 5000
+        },
+        {
+          "id": 68,
+          "invoice_id": 23,
+          "description": "MS Bright Bar",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 50,
+          "amount": 50
+        },
+        {
+          "id": 69,
+          "invoice_id": 23,
+          "description": "EN8 Steel Flat",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 665,
+          "amount": 665
+        },
+        {
+          "id": 70,
+          "invoice_id": 24,
+          "description": "SS Welding",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 450,
+          "amount": 450
+        },
+        {
+          "id": 71,
+          "invoice_id": 24,
+          "description": "Bush",
+          "hsn_code": "9988",
+          "qty": 2,
+          "rate": 625,
+          "amount": 1250
+        },
+        {
+          "id": 72,
+          "invoice_id": 24,
+          "description": "Rod",
+          "hsn_code": "9988",
+          "qty": 2,
+          "rate": 625,
+          "amount": 1250
+        },
+        {
+          "id": 73,
+          "invoice_id": 24,
+          "description": "Flange Plate",
+          "hsn_code": "9988",
+          "qty": 2,
+          "rate": 1700,
+          "amount": 3400
+        },
+        {
+          "id": 74,
+          "invoice_id": 24,
+          "description": "Index Plate",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 700,
+          "amount": 700
+        },
+        {
+          "id": 75,
+          "invoice_id": 24,
+          "description": "Rough Tapper Timing Pulley",
+          "hsn_code": "9988",
+          "qty": 4,
+          "rate": 1250,
+          "amount": 5000
+        },
+        {
+          "id": 76,
+          "invoice_id": 24,
+          "description": "20mm EN8 Pulley",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 3900,
+          "amount": 3900
+        },
+        {
+          "id": 77,
+          "invoice_id": 24,
+          "description": "20mm EN8 Pulley",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 1500,
+          "amount": 1500
+        },
+        {
+          "id": 78,
+          "invoice_id": 25,
+          "description": "Drilling Fixture 1",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 1800,
+          "amount": 1800
+        },
+        {
+          "id": 79,
+          "invoice_id": 25,
+          "description": "Drilling Fixture 2",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 4500,
+          "amount": 4500
+        },
+        {
+          "id": 80,
+          "invoice_id": 25,
+          "description": "Drilling Fixture 3",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 4500,
+          "amount": 4500
+        },
+        {
+          "id": 81,
+          "invoice_id": 26,
+          "description": "Humidity Indicator Washer Drilling",
+          "hsn_code": "84149090",
+          "qty": 220,
+          "rate": 8,
+          "amount": 1760
+        },
+        {
+          "id": 82,
+          "invoice_id": 27,
+          "description": "Locking Plate Fixture",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 12000,
+          "amount": 12000
+        },
+        {
+          "id": 83,
+          "invoice_id": 27,
+          "description": "Adaptor Plate Tapping Fixture",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 3500,
+          "amount": 3500
+        },
+        {
+          "id": 84,
+          "invoice_id": 28,
+          "description": "Locknut Tapping Fixture Small",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 4500,
+          "amount": 4500
+        },
+        {
+          "id": 85,
+          "invoice_id": 28,
+          "description": "Locknut Tapping Fixture Big",
+          "hsn_code": "9988",
+          "qty": 1,
+          "rate": 4500,
+          "amount": 4500
+        },
+        {
+          "id": 136,
+          "invoice_id": 51,
+          "description": "Spindle Work",
+          "hsn_code": "9985",
+          "qty": 1,
+          "rate": 500,
+          "amount": 500
+        },
+        {
+          "id": 137,
+          "invoice_id": 51,
+          "description": "SS Weld Work",
+          "hsn_code": "9985",
+          "qty": 1,
+          "rate": 500,
+          "amount": 500
+        },
+        {
+          "id": 138,
+          "invoice_id": 51,
+          "description": "Labour Work",
+          "hsn_code": "9985",
+          "qty": 1,
+          "rate": 1500,
+          "amount": 1500
+        },
+        {
+          "id": 139,
+          "invoice_id": 51,
+          "description": "SS Material",
+          "hsn_code": "9985",
+          "qty": 1,
+          "rate": 500,
+          "amount": 500
+        },
+        {
+          "id": 140,
+          "invoice_id": 51,
+          "description": "OD Size Machine Bracket",
+          "hsn_code": "9985",
+          "qty": 1,
+          "rate": 2500,
+          "amount": 2500
+        },
+        {
+          "id": 141,
+          "invoice_id": 51,
+          "description": "Sensor Bracket",
+          "hsn_code": "9985",
+          "qty": 2,
+          "rate": 200,
+          "amount": 400
+        },
+        {
+          "id": 142,
+          "invoice_id": 51,
+          "description": "Keyway Turning",
+          "hsn_code": "9985",
+          "qty": 1,
+          "rate": 200,
+          "amount": 200
+        },
+        {
+          "id": 143,
+          "invoice_id": 51,
+          "description": "Labour Cost",
+          "hsn_code": "9985",
+          "qty": 1,
+          "rate": 5000,
+          "amount": 5000
+        },
+        {
+          "id": 144,
+          "invoice_id": 52,
+          "description": "Mahogany Wood 4×2×3½",
+          "hsn_code": "4407",
+          "qty": 60,
+          "rate": 140,
+          "amount": 8400
+        },
+        {
+          "id": 145,
+          "invoice_id": 53,
+          "description": "Mahogany Wood Cut Size",
+          "hsn_code": "4407",
+          "qty": 1,
+          "rate": 1000,
+          "amount": 1000
+        },
+        {
+          "id": 146,
+          "invoice_id": 54,
+          "description": "Rake Gear Fixture",
+          "hsn_code": "998873",
+          "qty": 1,
+          "rate": 12000,
+          "amount": 12000
+        },
+        {
+          "id": 147,
+          "invoice_id": 55,
+          "description": "Mahogany Wood",
+          "hsn_code": "4407",
+          "qty": 50,
+          "rate": 140,
+          "amount": 7000
+        },
+        {
+          "id": 148,
+          "invoice_id": 56,
+          "description": "Mahogany Wood 5×1.5×7",
+          "hsn_code": "4407",
+          "qty": 23,
+          "rate": 350,
+          "amount": 8050
+        },
+        {
+          "id": 149,
+          "invoice_id": 57,
+          "description": "Support Actuator",
+          "hsn_code": "998873",
+          "qty": 504,
+          "rate": 4.5,
+          "amount": 2268
+        },
+        {
+          "id": 150,
+          "invoice_id": 57,
+          "description": "Support Actuator IV159",
+          "hsn_code": "998873",
+          "qty": 500,
+          "rate": 4.5,
+          "amount": 2250
+        },
+        {
+          "id": 151,
+          "invoice_id": 58,
+          "description": "Support Actuator IV159",
+          "hsn_code": "998873",
+          "qty": 500,
+          "rate": 4.5,
+          "amount": 2250
+        },
+        {
+          "id": 152,
+          "invoice_id": 59,
+          "description": "Mahogany Wood",
+          "hsn_code": "4407",
+          "qty": 100,
+          "rate": 200,
+          "amount": 20000
+        },
+        {
+          "id": 153,
+          "invoice_id": 59,
+          "description": "Mahogany Wood",
+          "hsn_code": "4407",
+          "qty": 80,
+          "rate": 125,
+          "amount": 10000
+        },
+        {
+          "id": 154,
+          "invoice_id": 60,
+          "description": "Bearing Spacer G-065",
+          "hsn_code": "998873",
+          "qty": 46,
+          "rate": 50,
+          "amount": 2300
+        },
+        {
+          "id": 155,
+          "invoice_id": 60,
+          "description": "Bearing Spacer E022",
+          "hsn_code": "998873",
+          "qty": 66,
+          "rate": 60,
+          "amount": 3960
+        },
+        {
+          "id": 156,
+          "invoice_id": 60,
+          "description": "Humidity Indicator",
+          "hsn_code": "998873",
+          "qty": 100,
+          "rate": 8,
+          "amount": 800
+        },
+        {
+          "id": 157,
+          "invoice_id": 61,
+          "description": "Adaptor Plate",
+          "hsn_code": "998873",
+          "qty": 1,
+          "rate": 8500,
+          "amount": 8500
+        },
+        {
+          "id": 158,
+          "invoice_id": 62,
+          "description": "Orifice Block",
+          "hsn_code": "998873",
+          "qty": 50,
+          "rate": 50,
+          "amount": 2500
+        },
+        {
+          "id": 159,
+          "invoice_id": 62,
+          "description": "Safety Valve Guard",
+          "hsn_code": "998898",
+          "qty": 200,
+          "rate": 18,
+          "amount": 3600
+        },
+        {
+          "id": 160,
+          "invoice_id": 63,
+          "description": "Oil Nozzle Rod",
+          "hsn_code": "998873",
+          "qty": 36,
+          "rate": 50,
+          "amount": 1800
+        },
+        {
+          "id": 161,
+          "invoice_id": 63,
+          "description": "Safety Valve Guard",
+          "hsn_code": "998898",
+          "qty": 40,
+          "rate": 18,
+          "amount": 720
+        },
+        {
+          "id": 162,
+          "invoice_id": 64,
+          "description": "Mahogany Wood",
+          "hsn_code": "4407",
+          "qty": 3,
+          "rate": 14350,
+          "amount": 43050
+        },
+        {
+          "id": 163,
+          "invoice_id": 65,
+          "description": "Support Actuator",
+          "hsn_code": "998873",
+          "qty": 500,
+          "rate": 4.5,
+          "amount": 2250
+        },
+        {
+          "id": 164,
+          "invoice_id": 65,
+          "description": "Safety Valve Guard",
+          "hsn_code": "998898",
+          "qty": 20,
+          "rate": 28,
+          "amount": 560
+        },
+        {
+          "id": 165,
+          "invoice_id": 65,
+          "description": "Motor Coupling",
+          "hsn_code": "998898",
+          "qty": 86,
+          "rate": 30,
+          "amount": 2580
+        },
+        {
+          "id": 166,
+          "invoice_id": 65,
+          "description": "Head Ring",
+          "hsn_code": "998898",
+          "qty": 55,
+          "rate": 110,
+          "amount": 6050
+        },
+        {
+          "id": 167,
+          "invoice_id": 65,
+          "description": "Bearing Spacer",
+          "hsn_code": "998898",
+          "qty": 24,
+          "rate": 80,
+          "amount": 1920
+        },
+        {
+          "id": 168,
+          "invoice_id": 66,
+          "description": "PCD Holes",
+          "hsn_code": "998873",
+          "qty": 1,
+          "rate": 200,
+          "amount": 200
+        },
+        {
+          "id": 169,
+          "invoice_id": 66,
+          "description": "Big Paddi",
+          "hsn_code": "998873",
+          "qty": 14,
+          "rate": 200,
+          "amount": 2800
+        },
+        {
+          "id": 170,
+          "invoice_id": 66,
+          "description": "Small Paddi",
+          "hsn_code": "998873",
+          "qty": 2,
+          "rate": 150,
+          "amount": 300
+        },
+        {
+          "id": 171,
+          "invoice_id": 66,
+          "description": "Small Paddi",
+          "hsn_code": "998873",
+          "qty": 5,
+          "rate": 80,
+          "amount": 400
+        },
+        {
+          "id": 172,
+          "invoice_id": 66,
+          "description": "Rough Tapper Labour",
+          "hsn_code": "998873",
+          "qty": 1,
+          "rate": 1500,
+          "amount": 1500
+        },
+        {
+          "id": 173,
+          "invoice_id": 66,
+          "description": "Small Paddi",
+          "hsn_code": "998873",
+          "qty": 43,
+          "rate": 60,
+          "amount": 2580
+        },
+        {
+          "id": 174,
+          "invoice_id": 67,
+          "description": "Support Actuator",
+          "hsn_code": "998873",
+          "qty": 950,
+          "rate": 4.5,
+          "amount": 4275
+        },
+        {
+          "id": 175,
+          "invoice_id": 67,
+          "description": "Shaft Connector",
+          "hsn_code": "998898",
+          "qty": 510,
+          "rate": 23,
+          "amount": 11730
+        },
+        {
+          "id": 176,
+          "invoice_id": 68,
+          "description": "Support Actuator",
+          "hsn_code": "998873",
+          "qty": 425,
+          "rate": 4.5,
+          "amount": 1913
+        },
+        {
+          "id": 177,
+          "invoice_id": 68,
+          "description": "Safety Valve Guard",
+          "hsn_code": "998898",
+          "qty": 192,
+          "rate": 25,
+          "amount": 4800
+        },
+        {
+          "id": 178,
+          "invoice_id": 69,
+          "description": "Drain Shaft Housing",
+          "hsn_code": "998873",
+          "qty": 100,
+          "rate": 15,
+          "amount": 1500
+        },
+        {
+          "id": 179,
+          "invoice_id": 69,
+          "description": "Gear",
+          "hsn_code": "998898",
+          "qty": 293,
+          "rate": 35,
+          "amount": 10255
+        },
+        {
+          "id": 180,
+          "invoice_id": 69,
+          "description": "Shaft Connector",
+          "hsn_code": "998898",
+          "qty": 100,
+          "rate": 23,
+          "amount": 2300
+        },
+        {
+          "id": 181,
+          "invoice_id": 69,
+          "description": "Clamp Ring",
+          "hsn_code": "998898",
+          "qty": 74,
+          "rate": 45,
+          "amount": 3330
+        },
+        {
+          "id": 182,
+          "invoice_id": 70,
+          "description": "Wire Rolling Machine",
+          "hsn_code": "8463",
+          "qty": 1,
+          "rate": 25000,
+          "amount": 25000
+        },
+        {
+          "id": 183,
+          "invoice_id": 71,
+          "description": "OD Machine Setting Labour",
+          "hsn_code": "998873",
+          "qty": 1,
+          "rate": 10000,
+          "amount": 10000
+        },
+        {
+          "id": 184,
+          "invoice_id": 71,
+          "description": "Rough Tapper Welding Turning",
+          "hsn_code": "998873",
+          "qty": 1,
+          "rate": 2100,
+          "amount": 2100
+        },
+        {
+          "id": 185,
+          "invoice_id": 71,
+          "description": "Spindle Labour",
+          "hsn_code": "998873",
+          "qty": 1,
+          "rate": 500,
+          "amount": 500
+        },
+        {
+          "id": 186,
+          "invoice_id": 72,
+          "description": "Support Actuator IV 159",
+          "hsn_code": "998873",
+          "qty": 740,
+          "rate": 4.5,
+          "amount": 3360
+        },
+        {
+          "id": 187,
+          "invoice_id": 72,
+          "description": "Support Actuator",
+          "hsn_code": "998898",
+          "qty": 210,
+          "rate": 4.5,
+          "amount": 945
+        },
+        {
+          "id": 188,
+          "invoice_id": 72,
+          "description": "Shaft Connector (Machining)",
+          "hsn_code": "998898",
+          "qty": 140,
+          "rate": 23,
+          "amount": 3220
+        },
+        {
+          "id": 189,
+          "invoice_id": 72,
+          "description": "Discharge Flange EG22",
+          "hsn_code": "998898",
+          "qty": 24,
+          "rate": 190,
+          "amount": 4560
+        },
+        {
+          "id": 190,
+          "invoice_id": 73,
+          "description": "SHAFT CONNECTOR FOR MACHINING",
+          "hsn_code": "998898",
+          "qty": 200,
+          "rate": 23,
+          "amount": 4600
+        }
+      ]
+    }
+  }
+}

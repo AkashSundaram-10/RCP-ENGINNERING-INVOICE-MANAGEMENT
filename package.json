@@ -12,7 +12,12 @@
     "import-invoices": "node backend/scripts/import-invoices.js",
     "clear-db": "node backend/scripts/clear-database.js"
   },
-  "keywords": ["invoice", "billing", "gst", "engineering"],
+  "keywords": [
+    "invoice",
+    "billing",
+    "gst",
+    "engineering"
+  ],
   "author": "Ram Chino Pesan Engineering",
   "license": "ISC",
   "dependencies": {
@@ -21,6 +26,7 @@
     "express": "^4.18.2",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
+    "pg": "^8.20.0",
     "sql.js": "^1.10.2",
     "uuid": "^9.0.0"
   },

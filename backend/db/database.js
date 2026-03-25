@@ -1,166 +1,195 @@
-const initSqlJs = require('sql.js');
-const fs = require('fs');
-const path = require('path');
+/**
+ * PostgreSQL Database Layer
+ * Maintains the same interface as sql.js version but uses PostgreSQL
+ * All methods are async, queries use parameterized statements for security
+ */
 
-const dbPath = path.join(__dirname, 'rcp_invoices.db');
-let db = null;
+const { Pool } = require('pg');
+require('dotenv').config();
 
+let pool = null;
+
+// Initialize database pool
 async function initializeDatabase() {
-  const SQL = await initSqlJs();
+  try {
+    // Support both DATABASE_URL and individual connection params
+    const connectionConfig = process.env.DATABASE_URL
+      ? {
+          connectionString: process.env.DATABASE_URL,
+          ssl: {
+            rejectUnauthorized: false  // For cloud providers like Render
+          }
+        }
+      : {
+          host: process.env.DB_HOST || 'localhost',
+          port: process.env.DB_PORT || 5432,
+          user: process.env.DB_USER || 'postgres',
+          password: process.env.DB_PASSWORD || '',
+          database: process.env.DB_NAME || 'invoice_db'
+        };
 
-  // Load existing database or create new one
-  if (fs.existsSync(dbPath)) {
-    const fileBuffer = fs.readFileSync(dbPath);
-    db = new SQL.Database(fileBuffer);
-  } else {
-    db = new SQL.Database();
-  }
+    pool = new Pool(connectionConfig);
 
-  // Create customers table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS customers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      address TEXT,
-      gstin TEXT,
-      phone TEXT,
-      email TEXT,
-      created_at TEXT DEFAULT (datetime('now'))
-    )
-  `);
+    // Test connection
+    const client = await pool.connect();
+    console.log('Connected to PostgreSQL database');
+    client.release();
 
-  // Create invoices table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS invoices (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      invoice_no TEXT UNIQUE NOT NULL,
-      date TEXT NOT NULL,
-      customer_id INTEGER,
-      subtotal REAL DEFAULT 0,
-      sgst REAL DEFAULT 0,
-      cgst REAL DEFAULT 0,
-      grand_total REAL DEFAULT 0,
-      payment_status TEXT DEFAULT 'pending',
-      notes TEXT,
-      created_at TEXT DEFAULT (datetime('now')),
-      FOREIGN KEY (customer_id) REFERENCES customers(id)
-    )
-  `);
+    // Create tables if not exist
+    await createTables();
 
-  // Create invoice_items table
-  db.run(`
-    CREATE TABLE IF NOT EXISTS invoice_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      invoice_id INTEGER NOT NULL,
-      description TEXT NOT NULL,
-      hsn_code TEXT,
-      qty REAL DEFAULT 1,
-      rate REAL DEFAULT 0,
-      amount REAL DEFAULT 0,
-      FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
-    )
-  `);
-
-  saveDatabase();
-  console.log('Database initialized successfully!');
-  return db;
-}
-
-// Save database to file
-function saveDatabase() {
-  if (db) {
-    const data = db.export();
-    const buffer = Buffer.from(data);
-    fs.writeFileSync(dbPath, buffer);
+    console.log('Database initialized successfully!');
+    return pool;
+  } catch (error) {
+    console.error('Database initialization failed:', error.message);
+    throw error;
   }
 }
 
-// Get database instance
+// Create all tables
+async function createTables() {
+  try {
+    const client = await pool.connect();
+
+    // Customers table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS customers (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        address TEXT,
+        gstin TEXT,
+        phone TEXT,
+        email TEXT,
+        created_at TIMESTAMP DEFAULT now()
+      )
+    `);
+
+    // Invoices table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS invoices (
+        id SERIAL PRIMARY KEY,
+        invoice_no TEXT UNIQUE NOT NULL,
+        date TEXT NOT NULL,
+        customer_id INTEGER,
+        subtotal REAL DEFAULT 0,
+        sgst REAL DEFAULT 0,
+        cgst REAL DEFAULT 0,
+        grand_total REAL DEFAULT 0,
+        payment_status TEXT DEFAULT 'pending',
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT now(),
+        FOREIGN KEY (customer_id) REFERENCES customers(id)
+      )
+    `);
+
+    // Invoice items table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS invoice_items (
+        id SERIAL PRIMARY KEY,
+        invoice_id INTEGER NOT NULL,
+        description TEXT NOT NULL,
+        hsn_code TEXT,
+        qty REAL DEFAULT 1,
+        rate REAL DEFAULT 0,
+        amount REAL DEFAULT 0,
+        FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
+      )
+    `);
+
+    client.release();
+    console.log('Tables verified/created');
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Get database pool
 function getDb() {
-  return db;
+  if (!pool) {
+    throw new Error('Database pool not initialized. Call initializeDatabase() first.');
+  }
+  return pool;
 }
 
 // Get the next invoice number
-function getNextInvoiceNumber() {
-  const result = db.exec(`
-    SELECT invoice_no FROM invoices
-    ORDER BY CAST(invoice_no AS INTEGER) DESC
-    LIMIT 1
-  `);
+async function getNextInvoiceNumber() {
+  try {
+    const result = await pool.query(`
+      SELECT invoice_no FROM invoices
+      ORDER BY CAST(invoice_no AS INTEGER) DESC
+      LIMIT 1
+    `);
 
-  if (result.length > 0 && result[0].values.length > 0) {
-    const lastNo = result[0].values[0][0];
-    const nextNum = parseInt(lastNo) + 1;
-    return nextNum.toString().padStart(3, '0');
+    if (result.rows.length > 0) {
+      const lastNo = result.rows[0].invoice_no;
+      const nextNum = parseInt(lastNo) + 1;
+      return nextNum.toString().padStart(3, '0');
+    }
+    return '001';
+  } catch (error) {
+    console.error('Error getting next invoice number:', error);
+    return '001';
   }
-  return '001';
 }
 
 // Helper functions for common operations
-function runQuery(sql, params = []) {
+async function runQuery(sql, params = []) {
   try {
-    db.run(sql, params);
-    saveDatabase();
-    return { success: true };
+    const result = await pool.query(sql, params);
+    return { success: true, result };
   } catch (error) {
+    console.error('Query error:', error.message);
     return { success: false, error: error.message };
   }
 }
 
-function getOne(sql, params = []) {
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  if (stmt.step()) {
-    const row = stmt.getAsObject();
-    stmt.free();
-    return row;
+async function getOne(sql, params = []) {
+  try {
+    const result = await pool.query(sql, params);
+    return result.rows.length > 0 ? result.rows[0] : null;
+  } catch (error) {
+    console.error('Query error:', error.message);
+    throw error;
   }
-  stmt.free();
-  return null;
 }
 
-function getAll(sql, params = []) {
-  const result = db.exec(sql);
-  if (result.length === 0) return [];
-
-  const columns = result[0].columns;
-  const values = result[0].values;
-
-  return values.map(row => {
-    const obj = {};
-    columns.forEach((col, idx) => {
-      obj[col] = row[idx];
-    });
-    return obj;
-  });
+async function getAll(sql, params = []) {
+  try {
+    const result = await pool.query(sql, params);
+    return result.rows || [];
+  } catch (error) {
+    console.error('Query error:', error.message);
+    throw error;
+  }
 }
 
-function insert(sql, params = []) {
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  stmt.step();
-  stmt.free();
-  saveDatabase();
-
-  // Get the last inserted ID using a reliable method
-  const idResult = db.exec('SELECT last_insert_rowid() as id');
-  if (idResult && idResult[0] && idResult[0].values && idResult[0].values.length > 0) {
-    const lastId = idResult[0].values[0][0];
-    if (lastId && lastId > 0) return lastId;
-  }
-
-  // Fallback: query based on the INSERT statement table
-  const tableMatch = sql.match(/INSERT INTO\s+(\w+)/i);
-  if (tableMatch) {
-    const tableName = tableMatch[1];
-    const maxResult = db.exec(`SELECT MAX(id) as id FROM ${tableName}`);
-    if (maxResult && maxResult[0] && maxResult[0].values && maxResult[0].values[0]) {
-      return maxResult[0].values[0][0];
+async function insert(sql, params = []) {
+  try {
+    const result = await pool.query(sql, params);
+    // PostgreSQL RETURNING clause returns the inserted row
+    if (result.rows.length > 0 && result.rows[0].id) {
+      return result.rows[0].id;
     }
+    return null;
+  } catch (error) {
+    console.error('Insert error:', error.message);
+    throw error;
   }
-  return null;
 }
 
+// Save database (no-op for PostgreSQL, kept for compatibility)
+async function saveDatabase() {
+  // PostgreSQL auto-saves, this is just a placeholder for compatibility
+  return Promise.resolve();
+}
+
+// Graceful shutdown
+async function closeDatabase() {
+  if (pool) {
+    await pool.end();
+    console.log('Database connection pool closed');
+  }
+}
 
 module.exports = {
   initializeDatabase,
@@ -170,5 +199,6 @@ module.exports = {
   runQuery,
   getOne,
   getAll,
-  insert
+  insert,
+  closeDatabase
 };
