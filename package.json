@@ -1,0 +1,30 @@
+{
+  "name": "rcp-invoice-app",
+  "version": "1.0.0",
+  "description": "Invoice Management System for Ram Chino Pesan Engineering",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "client": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "split-invoices": "node backend/scripts/split-invoices.js",
+    "import-invoices": "node backend/scripts/import-invoices.js",
+    "clear-db": "node backend/scripts/clear-database.js"
+  },
+  "keywords": ["invoice", "billing", "gst", "engineering"],
+  "author": "Ram Chino Pesan Engineering",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^1.1.1",
+    "sql.js": "^1.10.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

@@ -1,0 +1,137 @@
+═══════════════════════════════════════════════════════════════════════════════
+                    RCP INVOICE MANAGEMENT SYSTEM
+                          VISUAL PROJECT MAP
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         📱 CLIENT - BROWSER                                 │
+│                        (http://localhost:3001)                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  index.html (72KB)         dashboard.html          app.css (176 L)  │   │
+│  │  ├─ Dashboard              ├─ Template              ├─ Styles       │   │
+│  │  ├─ Invoice Manager        ├─ Layout                ├─ Responsive   │   │
+│  │  ├─ Customer List          └─ Structure             └─ UI           │   │
+│  │  └─ Analytics Charts                                                │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────┬───────────────────────────────────────────────────────┘
+                      │ HTTP/REST API Calls
+                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    🖥️  BACKEND - EXPRESS SERVER                             │
+│                     (Node.js running on Port 3001)                          │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │ server.js (entry point)                                               │  │
+│  │ ├─ Initialize Database                                               │  │
+│  │ ├─ Load CORS & Middleware                                            │  │
+│  │ ├─ Serve Static Files (index.html)                                   │  │
+│  │ └─ Mount Routes                                                      │  │
+│  └─────────────────────┬──────────────────────┬──────────────────────────┘  │
+│                        │                      │                             │
+│  ┌─────────────────────▼──┐     ┌─────────────▼────────────────────────┐  │
+│  │   ROUTES                │     │   DATABASE LAYER                    │  │
+│  │                         │     │                                     │  │
+│  │ invoices.js (284 L)     │     │ database.js (174 L)                 │  │
+│  │ ├─ GET /               │     │ ├─ initializeDatabase()             │  │
+│  │ ├─ POST /              │     │ ├─ getAll()                         │  │
+│  │ ├─ GET /:id            │     │ ├─ getOne()                         │  │
+│  │ ├─ PUT /:id            │     │ ├─ insert()                         │  │
+│  │ ├─ PATCH /status       │     │ ├─ runQuery()                       │  │
+│  │ ├─ DELETE /:id         │     │ ├─ saveDatabase()                   │  │
+│  │ └─ GET /analytics      │     │ └─ getNextInvoiceNumber()           │  │
+│  │                         │     │                                     │  │
+│  │ customers.js (140 L)    │     │ rcp_invoices.db (SQLite)            │  │
+│  │ ├─ GET /               │     │ ├─ customers table                  │  │
+│  │ ├─ POST /              │     │ ├─ invoices table                   │  │
+│  │ ├─ GET /search         │     │ └─ invoice_items table              │  │
+│  │ ├─ GET /:id            │     └─────────────────────────────────────┘  │
+│  │ ├─ PUT /:id            │                                                │
+│  │ └─ DELETE /:id         │                                                │
+│  └─────────────────────────┘                                                │
+└─────────────────────┬──────────────────────────────────────────────────────┘
+                      │
+        ┌─────────────┼────────────────────┐
+        │             │                    │
+        ▼             ▼                    ▼
+┌─────────────┐┌────────────────┐  ┌──────────────┐
+│ 📂 Scripts  ││ 📄 Utilities   │  │ 📦 Assets    │
+│             ││                │  │              │
+│ Import Data ││ Verification   │  │ logo.png     │
+│ Clear DB    ││ Analytics      │  │              │
+│ Split PDF   ││ Debugging      │  │ TAX INVOICE  │
+│ (25+ files) ││ Testing        │  │ (1.3MB PDF)  │
+└─────────────┘└────────────────┘  └──────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+
+                         📊 DATABASE STRUCTURE
+
+    ┌──────────────┐      ┌──────────────┐      ┌────────────────┐
+    │  CUSTOMERS   │      │  INVOICES    │      │ INVOICE_ITEMS  │
+    ├──────────────┤      ├──────────────┤      ├────────────────┤
+    │ id (PK)      │◄─────│ customer_id  │      │ id (PK)        │
+    │ name         │      │ id (PK)      │◄─────│ invoice_id (FK)│
+    │ address      │      │ invoice_no   │      │ description    │
+    │ gstin        │      │ date         │      │ hsn_code       │
+    │ phone        │      │ subtotal     │      │ qty            │
+    │ email        │      │ sgst (9%)    │      │ rate           │
+    │ created_at   │      │ cgst (9%)    │      │ amount         │
+    │              │      │ grand_total  │      │                │
+    │              │      │ payment_status      │                │
+    │              │      │ notes        │      │                │
+    │              │      │ created_at   │      │                │
+    └──────────────┘      └──────────────┘      └────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+
+                            🔌 API ENDPOINT OVERVIEW
+
+┌─────────────────────────┬──────────────────────────────────────────────────┐
+│ RESOURCE: INVOICES      │                                                  │
+├─────────────────────────┼──────────────────────────────────────────────────┤
+│ GET    /api/invoices    │ Get all invoices (with customer details)         │
+│ POST   /api/invoices    │ Create new invoice (auto-calc tax)               │
+│ GET    /api/invoices/:id│ Get single invoice with items                    │
+│ PUT    /api/invoices/:id│ Update invoice and items                         │
+│ PATCH  /invoices/:id/st │ Update payment status only                       │
+│ DELETE /api/invoices/:id│ Delete invoice (cascade delete items)            │
+│ GET    /invoices/analyts│ Get monthly analytics data                       │
+│ GET    /invoices/next-no│ Get next invoice number                          │
+└─────────────────────────┴──────────────────────────────────────────────────┘
+
+┌─────────────────────────┬──────────────────────────────────────────────────┐
+│ RESOURCE: CUSTOMERS     │                                                  │
+├─────────────────────────┼──────────────────────────────────────────────────┤
+│ GET    /api/customers   │ Get all customers (alphabetical)                 │
+│ POST   /api/customers   │ Create new customer                              │
+│ GET    /api/customers/:i│ Get single customer                              │
+│ GET    /customers/search│ Search customers by name (autocomplete)          │
+│ PUT    /api/customers/:i│ Update customer information                      │
+│ DELETE /api/customers/:i│ Delete customer (no invoices check)              │
+└─────────────────────────┴──────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+
+                          📋 PROJECT STATISTICS
+
+    Total Files          95+         | Backend Routes      2
+    API Endpoints        15+         | Database Tables     3
+    Utility Scripts      25+         | Total Code Lines    500+
+    Node Dependencies    7           | Package Version     1.0.0
+    Dev Dependencies     1           | Sample Data         51 invoices
+    Main HTML Size       72 KB       | Stylesheet Lines    176
+    Source PDF           1.3 MB      | Database Type       SQLite
+
+═══════════════════════════════════════════════════════════════════════════════
+
+                          🚀 QUICK START COMMANDS
+
+    npm start               → Start server (production)
+    npm run dev             → Start with auto-reload (development)
+    npm run clear-db        → Reset database to empty
+    npm run import-invoices → Import from PDF files
+    npm run split-invoices  → Split multi-page PDF into individual files
+
+    🌐 Browser: http://localhost:3001
+    ✅ Health Check: http://localhost:3001/api/health
+
+═══════════════════════════════════════════════════════════════════════════════
