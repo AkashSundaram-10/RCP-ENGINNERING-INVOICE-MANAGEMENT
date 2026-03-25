@@ -12,6 +12,14 @@ let pool = null;
 // Initialize database pool
 async function initializeDatabase() {
   try {
+    // Check if we're in a cloud environment and DATABASE_URL is missing
+    if (!process.env.DATABASE_URL && process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'DATABASE_URL environment variable is required in production. ' +
+        'Please set it in your Render dashboard under Environment variables.'
+      );
+    }
+
     // Support both DATABASE_URL and individual connection params
     const connectionConfig = process.env.DATABASE_URL
       ? {
@@ -27,6 +35,13 @@ async function initializeDatabase() {
           password: process.env.DB_PASSWORD || '',
           database: process.env.DB_NAME || 'invoice_db'
         };
+
+    console.log(`Attempting to connect to PostgreSQL...`);
+    if (process.env.DATABASE_URL) {
+      console.log('Using DATABASE_URL from environment');
+    } else {
+      console.log(`Attempting local connection to ${connectionConfig.host}:${connectionConfig.port}`);
+    }
 
     pool = new Pool(connectionConfig);
 
