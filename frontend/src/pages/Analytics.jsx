@@ -34,17 +34,22 @@ export default function Analytics() {
       totalInvoices: invoices.length,
     })
 
-    // Company-wise data
+    // Company-wise data - normalize customer names to combine duplicates
     const companyMap = {}
+    const companyNameMap = {} // Track original names for display
     invoices.forEach(inv => {
       const company = inv.customer_name || 'Unknown Customer'
-      if (!companyMap[company]) {
-        companyMap[company] = 0
+      const normalizedCompany = company.toLowerCase().trim()
+      
+      if (!companyMap[normalizedCompany]) {
+        companyMap[normalizedCompany] = 0
+        companyNameMap[normalizedCompany] = company // Store first occurrence for display
       }
-      companyMap[company] += inv.grand_total || 0
+      companyMap[normalizedCompany] += inv.grand_total || 0
     })
 
     const sortedCompanies = Object.entries(companyMap)
+      .map(([normalized, revenue]) => [companyNameMap[normalized], revenue])
       .sort(([,a], [,b]) => b - a)
       .slice(0, 10) // Top 10 companies
 

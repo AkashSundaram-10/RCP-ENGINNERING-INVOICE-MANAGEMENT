@@ -50,6 +50,18 @@ export default function Customers() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      // Check for duplicate customer names (case-insensitive)
+      const normalizedNewName = formData.name.toLowerCase().trim()
+      const isDuplicate = customers.some(customer => 
+        customer.id !== editingId && 
+        customer.name.toLowerCase().trim() === normalizedNewName
+      )
+      
+      if (isDuplicate) {
+        alert('A customer with this name already exists. Please use a different name.')
+        return
+      }
+      
       if (editingId) {
         await updateCustomer(editingId, formData)
       } else {
@@ -73,7 +85,29 @@ export default function Customers() {
     }
   }
 
-  return (
+  // Find duplicate customers (case-insensitive)
+  const findDuplicates = () => {
+    const nameMap = {}
+    const duplicates = []
+    
+    customers.forEach(customer => {
+      const normalized = customer.name.toLowerCase().trim()
+      if (!nameMap[normalized]) {
+        nameMap[normalized] = []
+      }
+      nameMap[normalized].push(customer)
+    })
+    
+    Object.entries(nameMap).forEach(([normalized, group]) => {
+      if (group.length > 1) {
+        duplicates.push({ normalized, group })
+      }
+    })
+    
+    return duplicates
+  }
+
+  const duplicates = findDuplicates()
     <div>
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -94,7 +128,29 @@ export default function Customers() {
           <p className="text-gray-500">No customers yet. Add your first customer!</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div>
+          {/* Duplicate Alert */}
+          {duplicates.length > 0 && (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Duplicate Customers Found</h3>
+              <p className="text-sm text-yellow-800 mb-3">These customers appear to be the same (different cases):</p>
+              <ul className="space-y-2">
+                {duplicates.map(({ normalized, group }) => (
+                  <li key={normalized} className="text-sm text-yellow-800">
+                    <strong>{group[0].name}</strong> has {group.length} duplicate(s):
+                    <div className="ml-4 text-xs mt-1 space-y-1">
+                      {group.map(c => (
+                        <div key={c.id}>{c.name} (ID: {c.id})</div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-yellow-700 mt-1">💡 Keep one and delete the others. They will be automatically combined in Analytics.</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="bg-white rounded-lg shadow overflow-hidden">
           <table className="w-full">
             <thead className="bg-amber-100 border-b border-gray-200">
               <tr>
