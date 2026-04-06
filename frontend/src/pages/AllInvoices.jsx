@@ -2,6 +2,19 @@ import { useState, useMemo } from 'react'
 import { useInvoices } from '../contexts/InvoiceContext'
 import { useNavigate } from 'react-router-dom'
 
+// Password for all operations
+const ADMIN_PASSWORD = '1981'
+
+// Check password function
+const checkPassword = () => {
+  const pwd = prompt('Enter admin password to continue:')
+  if (pwd !== ADMIN_PASSWORD) {
+    alert('Incorrect password!')
+    return false
+  }
+  return true
+}
+
 // Parse date from DD-MM-YYYY or YYYY-MM-DD format
 function parseDate(dateStr) {
   if (!dateStr) return null
@@ -21,13 +34,23 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
+// Normalize batch names to only 2025-2026 or 2026-2027
+function normalizeBatch(batch) {
+  if (!batch) return '2025-2026'
+  const batchLower = batch.toLowerCase()
+  if (batchLower.includes('2026-27') || batchLower.includes('2026-2027')) {
+    return '2026-2027'
+  }
+  return '2025-2026'
+}
+
 export default function AllInvoices() {
   const { invoices, loading, deleteInvoice, updateInvoiceStatus } = useInvoices()
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedMonths, setExpandedMonths] = useState({})
 
-  // Group invoices by batch
+  // Group invoices by batch (only 2 batches: 2025-2026 and 2026-2027)
   const groupedInvoices = useMemo(() => {
     let filtered = invoices
 
@@ -41,7 +64,8 @@ export default function AllInvoices() {
 
     const grouped = {}
     filtered.forEach(inv => {
-      const batchName = inv.batch || 'Batch 1'
+      // Normalize batch name to only 2 options
+      const batchName = normalizeBatch(inv.batch)
       
       if (!grouped[batchName]) {
         grouped[batchName] = { invoices: [] }
@@ -49,7 +73,7 @@ export default function AllInvoices() {
       grouped[batchName].invoices.push(inv)
     })
 
-    // Sort batches (Batch 2, Batch 1, etc.)
+    // Sort batches (2026-2027 first, then 2025-2026)
     return Object.entries(grouped)
       .sort(([a], [b]) => b.localeCompare(a))
       .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
@@ -62,7 +86,13 @@ export default function AllInvoices() {
     }))
   }
 
+  const handleView = (id) => {
+    if (!checkPassword()) return
+    navigate(`/invoices/${id}`)
+  }
+
   const handleDelete = async (id) => {
+    if (!checkPassword()) return
     if (window.confirm('Are you sure you want to delete this invoice?')) {
       try {
         await deleteInvoice(id)
@@ -73,6 +103,7 @@ export default function AllInvoices() {
   }
 
   const handleStatusToggle = async (id, currentStatus) => {
+    if (!checkPassword()) return
     const newStatus = currentStatus === 'paid' ? 'pending' : 'paid'
     try {
       await updateInvoiceStatus(id, newStatus)
@@ -168,7 +199,7 @@ export default function AllInvoices() {
                           </td>
                           <td className="px-6 py-3 text-sm space-x-2">
                             <button
-                              onClick={() => navigate(`/invoices/${invoice.id}`)}
+                              onClick={() => handleView(invoice.id)}
                               className="inline-block px-3 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700"
                             >
                               View

@@ -13,6 +13,15 @@ export default function ViewInvoice() {
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
 
+  const checkPassword = (action) => {
+    const password = prompt(`Enter password to ${action}:`)
+    if (password !== '1981') {
+      alert('Incorrect password!')
+      return false
+    }
+    return true
+  }
+
   useEffect(() => {
     const fetchInvoice = async () => {
       setLoading(true)
@@ -58,6 +67,8 @@ export default function ViewInvoice() {
   }
 
   const handleDelete = async () => {
+    if (!checkPassword('delete this invoice')) return
+    
     if (window.confirm('Are you sure you want to delete this invoice?')) {
       try {
         await deleteInvoice(id)
@@ -66,6 +77,11 @@ export default function ViewInvoice() {
         console.error('Error deleting invoice:', err)
       }
     }
+  }
+
+  const handleEdit = () => {
+    if (!checkPassword('edit this invoice')) return
+    setIsEditing(true)
   }
 
   if (loading) {
@@ -117,7 +133,7 @@ export default function ViewInvoice() {
             
             <div className="flex gap-3">
               <button
-                onClick={() => setIsEditing(true)}
+                onClick={handleEdit}
                 className="group px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 font-medium shadow-lg shadow-blue-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5 flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

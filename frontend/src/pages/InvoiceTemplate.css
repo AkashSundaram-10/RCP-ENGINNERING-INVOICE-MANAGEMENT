@@ -235,8 +235,7 @@
   display: flex;
   flex-direction: column;
   min-height: 600px;
-  max-height: 600px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .items-table {
@@ -306,19 +305,27 @@
 .totals-wrapper {
   display: flex;
   justify-content: flex-end;
-  padding: 0;
-  margin-top: 0px;
+  padding: 8px 0;
+  margin-top: 8px;
+  background: rgba(26, 60, 143, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(26, 60, 143, 0.2);
 }
 
 .totals-table {
-  width: 180px;
+  width: 200px;
   border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .totals-table td {
-  padding: 3px 6px;
-  font-size: 9px;
+  padding: 6px 8px;
+  font-size: 10px;
   border-bottom: 1px solid #e0e6f5;
+  font-weight: 500;
 }
 
 .totals-table td:last-child {

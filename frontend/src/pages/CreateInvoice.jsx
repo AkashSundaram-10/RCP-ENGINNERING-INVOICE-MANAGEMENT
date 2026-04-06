@@ -4,15 +4,67 @@ import { useCustomers } from '../contexts/CustomerContext'
 import { useNavigate } from 'react-router-dom'
 import './InvoiceTemplate.css'
 
+// Password for all operations
+const ADMIN_PASSWORD = '1981'
+
+// Check password function
+const checkPassword = () => {
+  const pwd = prompt('Enter admin password to create invoice:')
+  if (pwd !== ADMIN_PASSWORD) {
+    alert('Incorrect password!')
+    return false
+  }
+  return true
+}
+
 export default function CreateInvoice() {
   const navigate = useNavigate()
   const { createInvoice, getNextInvoiceNumber, getBatches } = useInvoices()
   const { customers, searchCustomers } = useCustomers()
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  // Check password on component mount
+  useEffect(() => {
+    if (!isAuthenticated) {
+      if (checkPassword()) {
+        setIsAuthenticated(true)
+      } else {
+        navigate('/invoices')
+      }
+    }
+  }, [])
 
   const [invoiceNo, setInvoiceNo] = useState('')
-  const [currentBatch, setCurrentBatch] = useState('Batch 2')
-  const [availableBatches, setAvailableBatches] = useState([])
+  const [currentBatch, setCurrentBatch] = useState('2025-2026')
+  const [availableBatches, setAvailableBatches] = useState(['2025-2026', '2026-2027'])
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
+
+  // Determine batch based on date
+  // Batch 1 (2025-2026): July 2, 2025 to March 31, 2026
+  // Batch 2 (2026-2027): April 1, 2026 to March 31, 2027
+  // And so on...
+  const getBatchForDate = (dateStr) => {
+    const d = new Date(dateStr)
+    const month = d.getMonth() + 1 // 1-12
+    const year = d.getFullYear()
+    
+    // Financial year starts April 1 (but for first batch starting July 2, 2025)
+    // If date is before April, it belongs to previous financial year
+    if (month >= 4) {
+      // April onwards - belongs to current year FY
+      return `${year}-${year + 1}`
+    } else {
+      // Jan-March - belongs to previous year FY
+      return `${year - 1}-${year}`
+    }
+  }
+
+  // Update batch when date changes
+  useEffect(() => {
+    const batch = getBatchForDate(date)
+    setCurrentBatch(batch)
+  }, [date])
   const [customerId, setCustomerId] = useState('')
   const [customerName, setCustomerName] = useState('')
   const [customerAddress, setCustomerAddress] = useState('')
@@ -22,20 +74,17 @@ export default function CreateInvoice() {
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false)
   const [filteredCustomers, setFilteredCustomers] = useState([])
 
-  // Load batches and next invoice number on mount
+  // Load next invoice number on mount and when batch changes
   useEffect(() => {
     const loadData = async () => {
-      // Load batches
-      const batches = await getBatches()
-      setAvailableBatches(batches)
-      
       // Load next number for current batch
-      const data = await getNextInvoiceNumber()
+      const data = await getNextInvoiceNumber(currentBatch)
       setInvoiceNo(data.next_number || '001')
-      setCurrentBatch(data.current_batch || 'Batch 2')
     }
-    loadData()
-  }, [getNextInvoiceNumber, getBatches])
+    if (currentBatch) {
+      loadData()
+    }
+  }, [getNextInvoiceNumber, currentBatch])
 
   // Handle customer search
   const handleCustomerSearch = async (value) => {
@@ -180,6 +229,15 @@ export default function CreateInvoice() {
     return convertThousands(num) + ' Only'
   }
 
+  // Show loading while checking auth
+  if (!isAuthenticated) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-xl text-gray-600">Authenticating...</div>
+      </div>
+    )
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 print-invoice-page">
       {/* Form Section (Left) */}
@@ -199,16 +257,12 @@ export default function CreateInvoice() {
                 onChange={(e) => setCurrentBatch(e.target.value)}
                 className="flex-1 px-3 py-2 border border-blue-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm"
               >
-                {availableBatches.map((batch) => (
-                  <option key={batch.batch} value={batch.batch}>
-                    {batch.batch} ({batch.invoice_count} invoices)
-                  </option>
-                ))}
-                <option value="Batch 2">Batch 2 (New - FY 2026-27)</option>
+                <option value="2025-2026">2025-2026 (FY Apr 2025 - Mar 2026)</option>
+                <option value="2026-2027">2026-2027 (FY Apr 2026 - Mar 2027)</option>
               </select>
             </div>
             <p className="text-xs text-blue-600 mt-2">
-              💡 Select "Batch 2" for new financial year (April 2026 onwards)
+              💡 Batch auto-selected based on invoice date
             </p>
           </div>
 

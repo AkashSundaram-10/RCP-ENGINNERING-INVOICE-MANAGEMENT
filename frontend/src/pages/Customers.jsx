@@ -13,13 +13,24 @@ export default function Customers() {
     email: '',
   })
 
+  const checkPassword = (action) => {
+    const password = prompt(`Enter password to ${action}:`)
+    if (password !== '1981') {
+      alert('Incorrect password!')
+      return false
+    }
+    return true
+  }
+
   const handleAddClick = () => {
+    if (!checkPassword('add a new customer')) return
     setEditingId(null)
     setFormData({ name: '', address: '', gstin: '', phone: '', email: '' })
     setShowModal(true)
   }
 
   const handleEditClick = (customer) => {
+    if (!checkPassword('edit this customer')) return
     setEditingId(customer.id)
     setFormData({
       name: customer.name,
@@ -51,6 +62,8 @@ export default function Customers() {
   }
 
   const handleDelete = async (id) => {
+    if (!checkPassword('delete this customer')) return
+    
     if (window.confirm('Are you sure you want to delete this customer?')) {
       try {
         await deleteCustomer(id)

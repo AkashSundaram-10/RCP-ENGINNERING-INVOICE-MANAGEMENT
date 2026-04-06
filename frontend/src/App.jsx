@@ -5,7 +5,8 @@ import AllInvoices from './pages/AllInvoices'
 import CreateInvoice from './pages/CreateInvoice'
 import ViewInvoice from './pages/ViewInvoice'
 import Customers from './pages/Customers'
-import AnalyticsSimple from './pages/AnalyticsSimple'
+import Analytics from './pages/Analytics'
+
 import { InvoiceProvider } from './contexts/InvoiceContext'
 import { CustomerProvider } from './contexts/CustomerContext'
 import { UIProvider } from './contexts/UIContext'
@@ -23,7 +24,8 @@ function App() {
                 <Route path="/invoices/create" element={<CreateInvoice />} />
                 <Route path="/invoices/:id" element={<ViewInvoice />} />
                 <Route path="/customers" element={<Customers />} />
-                <Route path="/analytics" element={<AnalyticsSimple />} />
+                <Route path="/analytics" element={<Analytics />} />
+
               </Routes>
             </Layout>
           </CustomerProvider>

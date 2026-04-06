@@ -1,405 +1,322 @@
 import { useEffect, useState } from 'react'
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js'
-import { Line, Bar, Doughnut } from 'react-chartjs-2'
 import { useInvoices } from '../contexts/InvoiceContext'
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js'
+import { Bar, Doughnut, Line } from 'react-chartjs-2'
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend, Filler)
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement)
 
 export default function Analytics() {
   const { invoices, loading } = useInvoices()
   const [stats, setStats] = useState({
     totalRevenue: 0,
-    monthlyAverage: 0,
     totalPaid: 0,
     totalPending: 0,
-    highestRevenueMonth: '',
-    highestRevenueAmount: 0,
     totalInvoices: 0,
-    paidCount: 0,
-    pendingCount: 0,
   })
-  const [chartData, setChartData] = useState(null)
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
-  const [availableYears, setAvailableYears] = useState([])
+  const [companyData, setCompanyData] = useState([])
+  const [monthlyData, setMonthlyData] = useState([])
+  const [paymentStatusData, setPaymentStatusData] = useState({ paid: 0, pending: 0 })
 
   useEffect(() => {
     if (invoices.length === 0) return
 
-    // Get available years
-    const years = [...new Set(invoices.map(inv => {
-      const date = new Date(inv.date)
-      return date.getFullYear()
-    }))].sort((a, b) => b - a)
-    setAvailableYears(years)
-
-    // Filter by selected year
-    const yearInvoices = invoices.filter(inv => {
-      const date = new Date(inv.date)
-      return date.getFullYear() === selectedYear
-    })
-
-    // Calculate overall stats
-    const totalRevenue = yearInvoices.reduce((sum, inv) => sum + (inv.grand_total || 0), 0)
-    const paidInvoices = yearInvoices.filter(inv => inv.payment_status === 'paid')
-    const pendingInvoices = yearInvoices.filter(inv => inv.payment_status !== 'paid')
-    const totalPaid = paidInvoices.reduce((sum, inv) => sum + (inv.grand_total || 0), 0)
+    // Basic stats
+    const totalRevenue = invoices.reduce((sum, inv) => sum + (inv.grand_total || 0), 0)
+    const totalPaid = invoices
+      .filter(inv => inv.payment_status === 'paid')
+      .reduce((sum, inv) => sum + (inv.grand_total || 0), 0)
     const totalPending = totalRevenue - totalPaid
-
-    // Group by month
-    const monthlyData = {}
-    const allMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    
-    // Initialize all months
-    allMonths.forEach((month, idx) => {
-      const monthKey = `${selectedYear}-${String(idx + 1).padStart(2, '0')}`
-      monthlyData[monthKey] = {
-        label: month,
-        revenue: 0,
-        paid: 0,
-        pending: 0,
-        count: 0,
-      }
-    })
-
-    yearInvoices.forEach(inv => {
-      const date = new Date(inv.date)
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-
-      if (monthlyData[monthKey]) {
-        monthlyData[monthKey].revenue += inv.grand_total || 0
-        monthlyData[monthKey].count += 1
-        if (inv.payment_status === 'paid') {
-          monthlyData[monthKey].paid += inv.grand_total || 0
-        } else {
-          monthlyData[monthKey].pending += inv.grand_total || 0
-        }
-      }
-    })
-
-    // Sort by month
-    const sortedMonths = Object.entries(monthlyData).sort(([a], [b]) => a.localeCompare(b))
-
-    const monthLabels = sortedMonths.map(([, data]) => data.label)
-    const revenueData = sortedMonths.map(([, data]) => data.revenue)
-    const paidData = sortedMonths.map(([, data]) => data.paid)
-    const pendingData = sortedMonths.map(([, data]) => data.pending)
-    const countData = sortedMonths.map(([, data]) => data.count)
-
-    // Find highest revenue month
-    let highestRevenueMonth = ''
-    let highestRevenueAmount = 0
-    sortedMonths.forEach(([, data]) => {
-      if (data.revenue > highestRevenueAmount) {
-        highestRevenueAmount = data.revenue
-        highestRevenueMonth = data.label
-      }
-    })
-
-    // Calculate growth (compare to previous month)
-    const growthData = revenueData.map((val, idx) => {
-      if (idx === 0) return 0
-      const prev = revenueData[idx - 1]
-      if (prev === 0) return 0
-      return ((val - prev) / prev * 100).toFixed(1)
-    })
 
     setStats({
       totalRevenue,
-      monthlyAverage: yearInvoices.length > 0 ? Math.round(totalRevenue / yearInvoices.length) : 0,
       totalPaid,
       totalPending,
-      highestRevenueMonth,
-      highestRevenueAmount,
-      totalInvoices: yearInvoices.length,
-      paidCount: paidInvoices.length,
-      pendingCount: pendingInvoices.length,
+      totalInvoices: invoices.length,
     })
 
-    setChartData({
-      monthLabels,
-      revenueData,
-      paidData,
-      pendingData,
-      countData,
-      growthData,
+    // Company-wise data
+    const companyMap = {}
+    invoices.forEach(inv => {
+      const company = inv.customer_name || 'Unknown Customer'
+      if (!companyMap[company]) {
+        companyMap[company] = 0
+      }
+      companyMap[company] += inv.grand_total || 0
     })
-  }, [invoices, selectedYear])
+
+    const sortedCompanies = Object.entries(companyMap)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 10) // Top 10 companies
+
+    setCompanyData(sortedCompanies)
+
+    // Parse date from DD-MM-YYYY format
+    const parseDate = (dateStr) => {
+      if (!dateStr) return null
+      // Check if it's DD-MM-YYYY format
+      if (dateStr.includes('-') && dateStr.split('-')[0].length <= 2) {
+        const [day, month, year] = dateStr.split('-')
+        return new Date(year, month - 1, day)
+      }
+      // Otherwise try ISO format
+      return new Date(dateStr)
+    }
+
+    // Monthly data - properly parse DD-MM-YYYY dates
+    const monthlyMap = {}
+    invoices.forEach(inv => {
+      const date = parseDate(inv.date)
+      if (!date || isNaN(date.getTime())) return
+      
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+      
+      if (!monthlyMap[monthKey]) {
+        monthlyMap[monthKey] = 0
+      }
+      monthlyMap[monthKey] += inv.grand_total || 0
+    })
+
+    const sortedMonthly = Object.entries(monthlyMap)
+      .sort(([a], [b]) => a.localeCompare(b))
+
+    setMonthlyData(sortedMonthly)
+
+    // Payment status data
+    setPaymentStatusData({
+      paid: totalPaid,
+      pending: totalPending
+    })
+
+  }, [invoices])
+
+  const formatAmount = (amount) => {
+    if (amount >= 100000) return `₹${(amount / 100000).toFixed(1)}L`
+    if (amount >= 1000) return `₹${(amount / 1000).toFixed(1)}K`
+    return `₹${amount.toFixed(0)}`
+  }
+
+  const formatMonth = (monthKey) => {
+    const [year, month] = monthKey.split('-')
+    const date = new Date(year, month - 1)
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  }
+
+  // Chart configurations
+  const companyChartData = {
+    labels: companyData.map(([name]) => name.length > 20 ? name.substring(0, 20) + '...' : name),
+    datasets: [
+      {
+        label: 'Revenue',
+        data: companyData.map(([, amount]) => amount),
+        backgroundColor: [
+          'rgba(59, 130, 246, 0.8)',
+          'rgba(16, 185, 129, 0.8)',
+          'rgba(245, 158, 11, 0.8)',
+          'rgba(239, 68, 68, 0.8)',
+          'rgba(139, 92, 246, 0.8)',
+          'rgba(236, 72, 153, 0.8)',
+          'rgba(20, 184, 166, 0.8)',
+          'rgba(251, 146, 60, 0.8)',
+          'rgba(34, 197, 94, 0.8)',
+          'rgba(168, 85, 247, 0.8)',
+        ],
+        borderColor: [
+          'rgba(59, 130, 246, 1)',
+          'rgba(16, 185, 129, 1)',
+          'rgba(245, 158, 11, 1)',
+          'rgba(239, 68, 68, 1)',
+          'rgba(139, 92, 246, 1)',
+          'rgba(236, 72, 153, 1)',
+          'rgba(20, 184, 166, 1)',
+          'rgba(251, 146, 60, 1)',
+          'rgba(34, 197, 94, 1)',
+          'rgba(168, 85, 247, 1)',
+        ],
+        borderWidth: 2,
+      },
+    ],
+  }
+
+  const monthlyChartData = {
+    labels: monthlyData.map(([month]) => formatMonth(month)),
+    datasets: [
+      {
+        label: 'Monthly Revenue',
+        data: monthlyData.map(([, amount]) => amount),
+        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+        borderColor: 'rgba(59, 130, 246, 1)',
+        borderWidth: 2,
+      },
+    ],
+  }
+
+  const paymentStatusChartData = {
+    labels: ['Paid', 'Pending'],
+    datasets: [
+      {
+        data: [paymentStatusData.paid, paymentStatusData.pending],
+        backgroundColor: ['rgba(34, 197, 94, 0.8)', 'rgba(245, 158, 11, 0.8)'],
+        borderColor: ['rgba(34, 197, 94, 1)', 'rgba(245, 158, 11, 1)'],
+        borderWidth: 2,
+      },
+    ],
+  }
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return `${context.label}: ${formatAmount(context.parsed.y || context.parsed)}`
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(value) {
+            return formatAmount(value)
+          }
+        }
+      }
+    }
+  }
+
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return `${context.label}: ${formatAmount(context.parsed)}`
+          }
+        }
+      }
+    }
+  }
 
   if (loading) {
-    return <div className="text-center py-8 text-gray-500">Loading...</div>
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-xl text-gray-600">Loading analytics...</div>
+      </div>
+    )
   }
 
   return (
     <div>
-      {/* Title with Year Selector */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Analytics & Performance</h1>
-        <select
-          value={selectedYear}
-          onChange={e => setSelectedYear(parseInt(e.target.value))}
-          className="px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {availableYears.map(year => (
-            <option key={year} value={year}>{year}</option>
-          ))}
-        </select>
-      </div>
+      {/* Title */}
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Analytics Dashboard</h1>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-lg p-6 text-white">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-blue-100 text-sm font-medium mb-1">Total Revenue</p>
-              <p className="text-3xl font-bold">₹{(stats.totalRevenue / 100000).toFixed(2)}L</p>
-            </div>
-            <div className="bg-white/20 p-3 rounded-lg">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-blue-200 text-xs mt-2">{stats.totalInvoices} invoices in {selectedYear}</p>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+          <p className="text-gray-600 text-sm font-medium mb-2">Total Revenue</p>
+          <p className="text-3xl font-bold text-blue-900">{formatAmount(stats.totalRevenue)}</p>
         </div>
-
-        <div className="bg-gradient-to-br from-green-500 to-green-700 rounded-xl shadow-lg p-6 text-white">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-green-100 text-sm font-medium mb-1">Paid Amount</p>
-              <p className="text-3xl font-bold">₹{(stats.totalPaid / 100000).toFixed(2)}L</p>
-            </div>
-            <div className="bg-white/20 p-3 rounded-lg">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-green-200 text-xs mt-2">{stats.paidCount} invoices paid</p>
+        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+          <p className="text-gray-600 text-sm font-medium mb-2">Paid Amount</p>
+          <p className="text-3xl font-bold text-green-600">{formatAmount(stats.totalPaid)}</p>
         </div>
-
-        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-amber-100 text-sm font-medium mb-1">Pending Amount</p>
-              <p className="text-3xl font-bold">₹{(stats.totalPending / 100000).toFixed(2)}L</p>
-            </div>
-            <div className="bg-white/20 p-3 rounded-lg">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-amber-200 text-xs mt-2">{stats.pendingCount} invoices pending</p>
+        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-amber-500">
+          <p className="text-gray-600 text-sm font-medium mb-2">Pending Amount</p>
+          <p className="text-3xl font-bold text-amber-600">{formatAmount(stats.totalPending)}</p>
         </div>
-
-        <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl shadow-lg p-6 text-white">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-purple-100 text-sm font-medium mb-1">Best Month</p>
-              <p className="text-3xl font-bold">{stats.highestRevenueMonth || '—'}</p>
-            </div>
-            <div className="bg-white/20 p-3 rounded-lg">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-purple-200 text-xs mt-2">₹{(stats.highestRevenueAmount / 1000).toFixed(0)}K revenue</p>
+        <div className="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
+          <p className="text-gray-600 text-sm font-medium mb-2">Total Invoices</p>
+          <p className="text-3xl font-bold text-purple-600">{stats.totalInvoices}</p>
         </div>
       </div>
 
-      {/* Charts */}
-      {chartData && (
-        <div className="space-y-6">
-          {/* Monthly Revenue Trend with Growth */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Monthly Revenue Trend - {selectedYear}</h2>
-              <Line
-                data={{
-                  labels: chartData.monthLabels,
-                  datasets: [
-                    {
-                      label: 'Revenue (₹)',
-                      data: chartData.revenueData,
-                      borderColor: '#3b82f6',
-                      backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                      fill: true,
-                      tension: 0.4,
-                      pointBackgroundColor: '#3b82f6',
-                      pointBorderColor: '#fff',
-                      pointBorderWidth: 2,
-                      pointRadius: 5,
-                    },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                      callbacks: {
-                        label: (context) => `₹${context.raw.toLocaleString()}`
-                      }
-                    }
-                  },
-                  scales: {
-                    y: { 
-                      beginAtZero: true,
-                      ticks: {
-                        callback: (value) => `₹${(value/1000).toFixed(0)}K`
-                      }
-                    },
-                  },
-                }}
-              />
-            </div>
-
-            {/* Payment Status Doughnut */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment Status</h2>
-              <Doughnut
-                data={{
-                  labels: ['Paid', 'Pending'],
-                  datasets: [
-                    {
-                      data: [stats.totalPaid, stats.totalPending],
-                      backgroundColor: ['#10b981', '#f59e0b'],
-                      borderWidth: 0,
-                    },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  plugins: {
-                    legend: { 
-                      position: 'bottom',
-                      labels: { padding: 20 }
-                    },
-                  },
-                  cutout: '60%',
-                }}
-              />
-              <div className="mt-4 text-center">
-                <p className="text-sm text-gray-600">
-                  Collection Rate: <span className="font-bold text-green-600">
-                    {stats.totalRevenue > 0 ? ((stats.totalPaid / stats.totalRevenue) * 100).toFixed(1) : 0}%
-                  </span>
-                </p>
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        
+        {/* Company-wise Revenue Chart */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Top Companies by Revenue</h2>
+          <div style={{ height: '400px' }}>
+            {companyData.length > 0 ? (
+              <Bar data={companyChartData} options={chartOptions} />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500">
+                No data available
               </div>
-            </div>
-          </div>
-
-          {/* Paid vs Pending Stacked Bar */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Paid vs Pending by Month</h2>
-            <Bar
-              data={{
-                labels: chartData.monthLabels,
-                datasets: [
-                  {
-                    label: 'Paid',
-                    data: chartData.paidData,
-                    backgroundColor: '#10b981',
-                    borderRadius: 4,
-                  },
-                  {
-                    label: 'Pending',
-                    data: chartData.pendingData,
-                    backgroundColor: '#f59e0b',
-                    borderRadius: 4,
-                  },
-                ],
-              }}
-              options={{
-                responsive: true,
-                plugins: {
-                  legend: { 
-                    display: true,
-                    position: 'top',
-                  },
-                  tooltip: {
-                    callbacks: {
-                      label: (context) => `${context.dataset.label}: ₹${context.raw.toLocaleString()}`
-                    }
-                  }
-                },
-                scales: {
-                  x: { stacked: true },
-                  y: { 
-                    stacked: true, 
-                    beginAtZero: true,
-                    ticks: {
-                      callback: (value) => `₹${(value/1000).toFixed(0)}K`
-                    }
-                  },
-                },
-              }}
-            />
-          </div>
-
-          {/* Invoice Count and Average */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Invoice Count by Month</h2>
-              <Bar
-                data={{
-                  labels: chartData.monthLabels,
-                  datasets: [
-                    {
-                      label: 'Invoices',
-                      data: chartData.countData,
-                      backgroundColor: '#8b5cf6',
-                      borderRadius: 6,
-                    },
-                  ],
-                }}
-                options={{
-                  responsive: true,
-                  plugins: {
-                    legend: { display: false },
-                  },
-                  scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                  },
-                }}
-              />
-            </div>
-
-            {/* Monthly Performance Table */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Monthly Performance</h2>
-              <div className="overflow-auto max-h-72">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50 sticky top-0">
-                    <tr>
-                      <th className="px-3 py-2 text-left font-semibold text-gray-700">Month</th>
-                      <th className="px-3 py-2 text-right font-semibold text-gray-700">Revenue</th>
-                      <th className="px-3 py-2 text-right font-semibold text-gray-700">Count</th>
-                      <th className="px-3 py-2 text-right font-semibold text-gray-700">Growth</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {chartData.monthLabels.map((month, idx) => (
-                      <tr key={month} className="border-t border-gray-100 hover:bg-gray-50">
-                        <td className="px-3 py-2 font-medium text-gray-900">{month}</td>
-                        <td className="px-3 py-2 text-right text-gray-700">₹{(chartData.revenueData[idx] / 1000).toFixed(1)}K</td>
-                        <td className="px-3 py-2 text-right text-gray-700">{chartData.countData[idx]}</td>
-                        <td className={`px-3 py-2 text-right font-medium ${
-                          parseFloat(chartData.growthData[idx]) > 0 ? 'text-green-600' : 
-                          parseFloat(chartData.growthData[idx]) < 0 ? 'text-red-600' : 'text-gray-500'
-                        }`}>
-                          {idx === 0 ? '—' : `${chartData.growthData[idx]}%`}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            )}
           </div>
         </div>
-      )}
+
+        {/* Payment Status Chart */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Payment Status Distribution</h2>
+          <div style={{ height: '400px' }}>
+            <Doughnut data={paymentStatusChartData} options={doughnutOptions} />
+          </div>
+        </div>
+      </div>
+
+      {/* Monthly Revenue Trend - Bar Chart */}
+      <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Monthly Revenue Trend</h2>
+        <div style={{ height: '400px' }}>
+          {monthlyData.length > 0 ? (
+            <Bar data={monthlyChartData} options={chartOptions} />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              No monthly data available
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Detailed Company Performance Table */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Company Performance Details</h2>
+        </div>
+        
+        {companyData.length === 0 ? (
+          <div className="p-6 text-center text-gray-500">No company data yet</div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Rank</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Company Name</th>
+                <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">Total Revenue</th>
+                <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900">Percentage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {companyData.map(([company, amount], index) => {
+                const percentage = ((amount / stats.totalRevenue) * 100).toFixed(1)
+                return (
+                  <tr key={company} className="border-b border-gray-200 hover:bg-gray-50">
+                    <td className="px-6 py-3 text-sm font-medium text-gray-900">#{index + 1}</td>
+                    <td className="px-6 py-3 text-sm text-gray-700">{company}</td>
+                    <td className="px-6 py-3 text-sm font-medium text-right">{formatAmount(amount)}</td>
+                    <td className="px-6 py-3 text-sm text-right">
+                      <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                        {percentage}%
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   )
 }

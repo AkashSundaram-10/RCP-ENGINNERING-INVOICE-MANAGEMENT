@@ -83,7 +83,7 @@ async function createTables() {
     await client.query(`
       CREATE TABLE IF NOT EXISTS invoices (
         id SERIAL PRIMARY KEY,
-        invoice_no TEXT UNIQUE NOT NULL,
+        invoice_no TEXT NOT NULL,
         date TEXT NOT NULL,
         customer_id INTEGER,
         subtotal REAL DEFAULT 0,
@@ -92,8 +92,11 @@ async function createTables() {
         grand_total REAL DEFAULT 0,
         payment_status TEXT DEFAULT 'pending',
         notes TEXT,
+        batch TEXT,
+        batch_invoice_no TEXT,
         created_at TIMESTAMP DEFAULT now(),
-        FOREIGN KEY (customer_id) REFERENCES customers(id)
+        FOREIGN KEY (customer_id) REFERENCES customers(id),
+        UNIQUE(batch, invoice_no)
       )
     `);
 
@@ -111,8 +114,26 @@ async function createTables() {
       )
     `);
 
+    // Migration: Add batch columns if they don't exist
+    try {
+      await client.query(`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS batch TEXT`);
+      await client.query(`ALTER TABLE invoices ADD COLUMN IF NOT EXISTS batch_invoice_no TEXT`);
+      console.log('Migration: Added batch columns if not existing');
+    } catch (error) {
+      console.log('Migration note: Batch columns may already exist');
+    }
+
+    // Migration: Drop old unique constraint and add new one
+    try {
+      await client.query(`ALTER TABLE invoices DROP CONSTRAINT IF EXISTS invoices_invoice_no_key`);
+      await client.query(`ALTER TABLE invoices ADD CONSTRAINT invoices_batch_invoice_no_unique UNIQUE(batch, invoice_no)`);
+      console.log('Migration: Updated unique constraints for batch support');
+    } catch (error) {
+      console.log('Migration note: Constraint changes may already be applied or table is new');
+    }
+
     client.release();
-    console.log('Tables verified/created');
+    console.log('Tables verified/created and migrations completed');
   } catch (error) {
     throw error;
   }
