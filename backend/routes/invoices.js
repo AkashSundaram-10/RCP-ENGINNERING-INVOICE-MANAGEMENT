@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getNextInvoiceNumber, getAll, getOne, insert, runQuery } = require('../db/database');
+const { getNextInvoiceNumber, getCurrentBatch, getAll, getOne, insert, runQuery } = require('../db/database');
 
 // GET all invoices with customer details
 router.get('/', async (req, res) => {
@@ -80,11 +80,36 @@ router.get('/analytics/monthly', async (req, res) => {
   }
 });
 
-// GET next invoice number
+// GET all batches
+router.get('/batches', async (req, res) => {
+  try {
+    const batches = await getAll(`
+      SELECT 
+        batch,
+        COUNT(*) as invoice_count,
+        SUM(grand_total) as total_revenue,
+        MIN(date) as start_date,
+        MAX(date) as end_date
+      FROM invoices
+      GROUP BY batch
+      ORDER BY batch DESC
+    `);
+    res.json(batches);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET next invoice number (with optional batch)
 router.get('/next-number', async (req, res) => {
   try {
-    const nextNumber = await getNextInvoiceNumber();
-    res.json({ invoice_no: nextNumber });
+    const batch = req.query.batch || await getCurrentBatch();
+    const nextNumber = await getNextInvoiceNumber(batch);
+    const currentBatch = await getCurrentBatch();
+    res.json({ 
+      next_number: nextNumber,
+      current_batch: currentBatch
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -123,9 +148,60 @@ router.get('/:id', async (req, res) => {
 
 // POST create new invoice with items
 router.post('/', async (req, res) => {
-  const { invoice_no, date, customer_id, items, notes } = req.body;
+  const { 
+    invoice_no, 
+    date, 
+    customer_id, 
+    customer_name,
+    customer_address,
+    customer_gstin,
+    customer_phone,
+    items, 
+    notes,
+    batch  // New field
+  } = req.body;
 
   try {
+    // Determine batch
+    const finalBatch = batch || await getCurrentBatch();
+    const batch_invoice_no = invoice_no; // Use same number within batch
+
+    // Check if invoice number already exists in this batch
+    const existingInvoice = await getOne(
+      'SELECT id FROM invoices WHERE batch = $1 AND batch_invoice_no = $2',
+      [finalBatch, batch_invoice_no]
+    );
+    
+    if (existingInvoice) {
+      const nextNumber = await getNextInvoiceNumber(finalBatch);
+      return res.status(400).json({ 
+        error: `Invoice number ${batch_invoice_no} already exists in ${finalBatch}. Try using ${nextNumber}`,
+        suggested_number: nextNumber
+      });
+    }
+
+    let finalCustomerId = customer_id;
+
+    // If no customer_id provided but customer details exist, create or find customer
+    if (!finalCustomerId && customer_name) {
+      // Check if customer already exists
+      const existingCustomer = await getOne(
+        'SELECT id FROM customers WHERE LOWER(name) = LOWER($1)',
+        [customer_name]
+      );
+
+      if (existingCustomer) {
+        finalCustomerId = existingCustomer.id;
+      } else {
+        // Create new customer
+        finalCustomerId = await insert(`
+          INSERT INTO customers (name, address, gstin, phone)
+          VALUES ($1, $2, $3, $4)
+          RETURNING id
+        `, [customer_name, customer_address || '', customer_gstin || '', customer_phone || '']);
+      }
+    }
+
     // Calculate totals
     let subtotal = 0;
     if (items && Array.isArray(items)) {
@@ -138,12 +214,12 @@ router.post('/', async (req, res) => {
     const cgst = subtotal * 0.09; // 9% CGST
     const grand_total = subtotal + sgst + cgst;
 
-    // Insert invoice
+    // Insert invoice with batch info
     const invoiceId = await insert(`
-      INSERT INTO invoices (invoice_no, date, customer_id, subtotal, sgst, cgst, grand_total, notes)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO invoices (invoice_no, batch, batch_invoice_no, date, customer_id, subtotal, sgst, cgst, grand_total, notes)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING id
-    `, [invoice_no, date, customer_id || null, subtotal, sgst, cgst, grand_total, notes || '']);
+    `, [invoice_no, finalBatch, batch_invoice_no, date, finalCustomerId || null, subtotal, sgst, cgst, grand_total, notes || '']);
 
     // Insert items
     if (items && Array.isArray(items)) {
@@ -159,9 +235,12 @@ router.post('/', async (req, res) => {
     res.status(201).json({
       id: invoiceId,
       invoice_no,
+      batch: finalBatch,
+      batch_invoice_no,
       message: 'Invoice created successfully'
     });
   } catch (error) {
+    console.error('Invoice creation error:', error);
     res.status(500).json({ error: error.message });
   }
 });

@@ -126,17 +126,34 @@ function getDb() {
   return pool;
 }
 
-// Get the next invoice number
-async function getNextInvoiceNumber() {
+// Get the next invoice number for a specific batch
+async function getNextInvoiceNumber(batch = null) {
   try {
-    const result = await pool.query(`
-      SELECT invoice_no FROM invoices
-      ORDER BY CAST(invoice_no AS INTEGER) DESC
-      LIMIT 1
-    `);
+    let query, params;
+    
+    if (batch) {
+      // Get next number for specific batch
+      query = `
+        SELECT batch_invoice_no FROM invoices
+        WHERE batch = $1
+        ORDER BY CAST(batch_invoice_no AS INTEGER) DESC
+        LIMIT 1
+      `;
+      params = [batch];
+    } else {
+      // Get next number overall (for backward compatibility)
+      query = `
+        SELECT invoice_no FROM invoices
+        ORDER BY CAST(invoice_no AS INTEGER) DESC
+        LIMIT 1
+      `;
+      params = [];
+    }
+
+    const result = await pool.query(query, params);
 
     if (result.rows.length > 0) {
-      const lastNo = result.rows[0].invoice_no;
+      const lastNo = batch ? result.rows[0].batch_invoice_no : result.rows[0].invoice_no;
       const nextNum = parseInt(lastNo) + 1;
       return nextNum.toString().padStart(3, '0');
     }
@@ -144,6 +161,27 @@ async function getNextInvoiceNumber() {
   } catch (error) {
     console.error('Error getting next invoice number:', error);
     return '001';
+  }
+}
+
+// Get current active batch
+async function getCurrentBatch() {
+  try {
+    // You can implement logic to determine current batch
+    // For now, return Batch 2 for new financial year
+    const result = await pool.query(`
+      SELECT batch FROM invoices
+      ORDER BY id DESC
+      LIMIT 1
+    `);
+    
+    if (result.rows.length > 0 && result.rows[0].batch) {
+      return result.rows[0].batch;
+    }
+    return 'Batch 2'; // New batch for FY 2026-27
+  } catch (error) {
+    console.error('Error getting current batch:', error);
+    return 'Batch 2';
   }
 }
 
@@ -210,6 +248,7 @@ module.exports = {
   initializeDatabase,
   getDb,
   getNextInvoiceNumber,
+  getCurrentBatch,
   saveDatabase,
   runQuery,
   getOne,

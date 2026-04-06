@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Print styles for A4 invoice */
+@page {
+  size: 210mm 297mm;
+  margin: 0;
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    overflow: hidden !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* Hide navigation, buttons, and forms */
+  button,
+  nav,
+  header {
+    display: none !important;
+  }
+
+  /* For CreateInvoice page - hide form, show only invoice */
+  .print-invoice-page > div:first-child {
+    display: none !important;
+  }
+
+  .print-invoice-page {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Invoice preview wrapper */
+  .invoice-preview-wrapper {
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+  }
+
+  /* Invoice container */
+  .invoice {
+    width: 210mm !important;
+    height: 297mm !important;
+    max-height: 297mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    overflow: hidden !important;
+  }
+
+  /* Prevent any page breaks inside invoice */
+  .invoice > * {
+    page-break-inside: avoid !important;
+  }
+}
+
+/* Custom animations */
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.toast {
+  animation: slideIn 0.3s ease-out;
+}
+
+.modal {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Typography */
+@layer components {
+  .heading-lg {
+    @apply text-3xl font-bold;
+  }
+
+  .heading-md {
+    @apply text-2xl font-bold;
+  }
+
+  .heading-sm {
+    @apply text-lg font-semibold;
+  }
+
+  .body-text {
+    @apply text-gray-700;
+  }
+
+  .label-text {
+    @apply text-sm font-medium text-gray-600;
+  }
+}
+
+/* Form elements */
+@layer components {
+  .input-primary {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90 transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-secondary text-white rounded-md hover:bg-opacity-90 transition-all duration-200;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-danger text-white rounded-md hover:bg-opacity-90 transition-all duration-200;
+  }
+
+  .btn-success {
+    @apply px-4 py-2 bg-success text-white rounded-md hover:bg-opacity-90 transition-all duration-200;
+  }
+}
