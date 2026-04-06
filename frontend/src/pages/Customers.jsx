@@ -108,6 +108,8 @@ export default function Customers() {
   }
 
   const duplicates = findDuplicates()
+
+  return (
     <div>
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -201,6 +203,7 @@ export default function Customers() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
