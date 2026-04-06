@@ -315,4 +315,19 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// PATCH bulk update customer_id for invoices
+router.patch('/bulk/update-customer', async (req, res) => {
+  const { fromCustomerId, toCustomerId } = req.body;
+
+  try {
+    const result = await runQuery(
+      `UPDATE invoices SET customer_id = $1 WHERE customer_id = $2`,
+      [toCustomerId, fromCustomerId]
+    );
+    res.json({ message: `Updated invoices from customer ${fromCustomerId} to ${toCustomerId}` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
