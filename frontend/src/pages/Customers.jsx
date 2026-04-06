@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useCustomers } from '../contexts/CustomerContext'
 
 export default function Customers() {
-  const { customers, loading, deleteCustomer, createCustomer, updateCustomer } = useCustomers()
+  const { customers, loading, deleteCustomer, createCustomer, updateCustomer, mergeCustomers } = useCustomers()
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [formData, setFormData] = useState({
@@ -134,16 +134,28 @@ export default function Customers() {
             <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Duplicate Customers Found</h3>
               <p className="text-sm text-yellow-800 mb-3">These customers appear to be the same (different cases):</p>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {duplicates.map(({ normalized, group }) => (
-                  <li key={normalized} className="text-sm text-yellow-800">
+                  <li key={normalized} className="text-sm text-yellow-800 border-b border-yellow-200 pb-3">
                     <strong>{group[0].name}</strong> has {group.length} duplicate(s):
                     <div className="ml-4 text-xs mt-1 space-y-1">
                       {group.map(c => (
                         <div key={c.id}>{c.name} (ID: {c.id})</div>
                       ))}
                     </div>
-                    <p className="text-xs text-yellow-700 mt-1">💡 Keep one and delete the others. They will be automatically combined in Analytics.</p>
+                    <button
+                      onClick={async () => {
+                        if (!checkPassword('merge these customers')) return
+                        if (window.confirm(`Merge all "${group[0].name}" duplicates into one? This will combine all invoices.`)) {
+                          const keepId = group[0].id
+                          const deleteIds = group.slice(1).map(c => c.id)
+                          await mergeCustomers(keepId, deleteIds)
+                        }
+                      }}
+                      className="mt-2 px-3 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700"
+                    >
+                      🔗 Merge into "{group[0].name}"
+                    </button>
                   </li>
                 ))}
               </ul>

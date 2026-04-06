@@ -111,6 +111,27 @@ export function CustomerProvider({ children }) {
     }
   }, [showToast])
 
+  // Merge duplicate customers
+  const mergeCustomers = useCallback(async (keepId, deleteIds) => {
+    setLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/customers/merge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ keepId, deleteIds })
+      })
+      if (!res.ok) throw new Error('Failed to merge customers')
+      await loadCustomers() // Reload the list
+      showToast('Customers merged successfully', 'success')
+    } catch (err) {
+      setError(err.message)
+      showToast('Failed to merge customers', 'error')
+      throw err
+    } finally {
+      setLoading(false)
+    }
+  }, [showToast, loadCustomers])
+
   // Search customers
   const searchCustomers = useCallback(async (query) => {
     if (!query.trim()) {
@@ -142,6 +163,7 @@ export function CustomerProvider({ children }) {
     createCustomer,
     updateCustomer,
     deleteCustomer,
+    mergeCustomers,
     searchCustomers,
   }
 

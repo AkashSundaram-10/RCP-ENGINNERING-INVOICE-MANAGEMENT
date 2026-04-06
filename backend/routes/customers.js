@@ -106,4 +106,31 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// POST merge duplicate customers into one
+router.post('/merge', async (req, res) => {
+  const { keepId, deleteIds } = req.body;
+
+  if (!keepId || !deleteIds || !Array.isArray(deleteIds) || deleteIds.length === 0) {
+    return res.status(400).json({ error: 'keepId and deleteIds array required' });
+  }
+
+  try {
+    // Update all invoices from deleted customers to the kept customer
+    for (const deleteId of deleteIds) {
+      await runQuery(`
+        UPDATE invoices 
+        SET customer_id = $1, customer_name = (SELECT name FROM customers WHERE id = $1)
+        WHERE customer_id = $2
+      `, [keepId, deleteId]);
+
+      // Delete the duplicate customer
+      await runQuery('DELETE FROM customers WHERE id = $1', [deleteId]);
+    }
+
+    res.json({ message: `Merged ${deleteIds.length} customer(s) into ID ${keepId}` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
