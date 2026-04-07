@@ -172,7 +172,7 @@
 }
 
 .bill-to .customer-name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: #111;
   margin-bottom: 4px;
@@ -180,14 +180,14 @@
 }
 
 .bill-to .customer-addr {
-  font-size: 9px;
+  font-size: 11px;
   color: #4b5563;
   line-height: 1.4;
   margin-bottom: 6px;
 }
 
 .bill-to .customer-gstin {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: #dc2626;
   background: #fef2f2;
@@ -537,7 +537,7 @@
   }
 
   .bill-to .customer-gstin {
-    font-size: 11px !important;
+    font-size: 13px !important;
     background: #fef2f2 !important;
     border: 1px solid #fecaca !important;
   }

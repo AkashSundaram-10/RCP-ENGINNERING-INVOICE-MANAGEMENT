@@ -2,14 +2,11 @@ import { useState, useMemo } from 'react'
 import { useInvoices } from '../contexts/InvoiceContext'
 import { useNavigate } from 'react-router-dom'
 
-// Password for all operations
-const ADMIN_PASSWORD = '1981'
-
 // Check password function
 const checkPassword = () => {
-  const pwd = prompt('Enter admin password to continue:')
-  if (pwd !== ADMIN_PASSWORD) {
-    alert('Incorrect password!')
+  const pwd = prompt('Type "DELETE" to continue:')
+  if (pwd !== 'DELETE') {
+    alert('Incorrect! You must type DELETE to proceed.')
     return false
   }
   return true

@@ -14,9 +14,9 @@ export default function Customers() {
   })
 
   const checkPassword = (action) => {
-    const password = prompt(`Enter password to ${action}:`)
-    if (password !== '1981') {
-      alert('Incorrect password!')
+    const password = prompt(`Type "DELETE" to ${action}:`)
+    if (password !== 'DELETE') {
+      alert('Incorrect! You must type DELETE to proceed.')
       return false
     }
     return true
