@@ -13,9 +13,20 @@ export default function ViewInvoice() {
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
 
-  const checkPassword = (action) => {
-    const password = prompt(`Type "DELETE" to ${action}:`)
-    if (password !== 'DELETE') {
+  // Password for edit actions
+  const checkPassword = () => {
+    const password = prompt('Enter password:')
+    if (password !== '1981') {
+      alert('Incorrect password!')
+      return false
+    }
+    return true
+  }
+
+  // Confirmation for delete action
+  const checkDeleteConfirmation = () => {
+    const confirmation = prompt('Type "DELETE" to continue:')
+    if (confirmation !== 'DELETE') {
       alert('Incorrect! You must type DELETE to proceed.')
       return false
     }
@@ -67,7 +78,7 @@ export default function ViewInvoice() {
   }
 
   const handleDelete = async () => {
-    if (!checkPassword('delete this invoice')) return
+    if (!checkDeleteConfirmation()) return
     
     if (window.confirm('Are you sure you want to delete this invoice?')) {
       try {
@@ -80,7 +91,7 @@ export default function ViewInvoice() {
   }
 
   const handleEdit = () => {
-    if (!checkPassword('edit this invoice')) return
+    if (!checkPassword()) return
     setIsEditing(true)
   }
 

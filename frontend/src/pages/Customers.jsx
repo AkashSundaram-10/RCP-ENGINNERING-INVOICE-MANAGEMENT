@@ -13,9 +13,20 @@ export default function Customers() {
     email: '',
   })
 
-  const checkPassword = (action) => {
-    const password = prompt(`Type "DELETE" to ${action}:`)
-    if (password !== 'DELETE') {
+  // Password for add/edit/merge actions
+  const checkPassword = () => {
+    const password = prompt('Enter password:')
+    if (password !== '1981') {
+      alert('Incorrect password!')
+      return false
+    }
+    return true
+  }
+
+  // Confirmation for delete action
+  const checkDeleteConfirmation = () => {
+    const confirmation = prompt('Type "DELETE" to continue:')
+    if (confirmation !== 'DELETE') {
       alert('Incorrect! You must type DELETE to proceed.')
       return false
     }
@@ -23,14 +34,14 @@ export default function Customers() {
   }
 
   const handleAddClick = () => {
-    if (!checkPassword('add a new customer')) return
+    if (!checkPassword()) return
     setEditingId(null)
     setFormData({ name: '', address: '', gstin: '', phone: '', email: '' })
     setShowModal(true)
   }
 
   const handleEditClick = (customer) => {
-    if (!checkPassword('edit this customer')) return
+    if (!checkPassword()) return
     setEditingId(customer.id)
     setFormData({
       name: customer.name,
@@ -74,7 +85,7 @@ export default function Customers() {
   }
 
   const handleDelete = async (id) => {
-    if (!checkPassword('delete this customer')) return
+    if (!checkDeleteConfirmation()) return
     
     if (window.confirm('Are you sure you want to delete this customer?')) {
       try {
@@ -147,7 +158,7 @@ export default function Customers() {
                     </div>
                     <button
                       onClick={async () => {
-                        if (!checkPassword('merge these customers')) return
+                        if (!checkPassword()) return
                         if (window.confirm(`Merge all "${group[0].name}" duplicates into one? This will combine all invoices.`)) {
                           const keepId = group[0].id
                           const deleteIds = group.slice(1).map(c => c.id)

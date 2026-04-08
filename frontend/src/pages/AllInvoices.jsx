@@ -2,10 +2,20 @@ import { useState, useMemo } from 'react'
 import { useInvoices } from '../contexts/InvoiceContext'
 import { useNavigate } from 'react-router-dom'
 
-// Check password function
-const checkPassword = () => {
-  const pwd = prompt('Type "DELETE" to continue:')
-  if (pwd !== 'DELETE') {
+// Check password for view/status actions
+const checkViewPassword = () => {
+  const pwd = prompt('Enter password:')
+  if (pwd !== '1981') {
+    alert('Incorrect password!')
+    return false
+  }
+  return true
+}
+
+// Check delete confirmation
+const checkDeleteConfirmation = () => {
+  const confirmation = prompt('Type "DELETE" to continue:')
+  if (confirmation !== 'DELETE') {
     alert('Incorrect! You must type DELETE to proceed.')
     return false
   }
@@ -84,12 +94,12 @@ export default function AllInvoices() {
   }
 
   const handleView = (id) => {
-    if (!checkPassword()) return
+    if (!checkViewPassword()) return
     navigate(`/invoices/${id}`)
   }
 
   const handleDelete = async (id) => {
-    if (!checkPassword()) return
+    if (!checkDeleteConfirmation()) return
     if (window.confirm('Are you sure you want to delete this invoice?')) {
       try {
         await deleteInvoice(id)
@@ -100,7 +110,7 @@ export default function AllInvoices() {
   }
 
   const handleStatusToggle = async (id, currentStatus) => {
-    if (!checkPassword()) return
+    if (!checkViewPassword()) return
     const newStatus = currentStatus === 'paid' ? 'pending' : 'paid'
     try {
       await updateInvoiceStatus(id, newStatus)
