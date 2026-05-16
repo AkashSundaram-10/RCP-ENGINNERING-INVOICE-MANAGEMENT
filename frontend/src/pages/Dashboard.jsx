@@ -12,18 +12,16 @@ export default function Dashboard() {
   
   const [customerStats, setCustomerStats] = useState([])
 
-  // Animal symbols for repeat customers (customers with more than 1 invoice)
-  const animalSymbols = [
-    { emoji: '🦁', name: 'Lion' },
-    { emoji: '🐯', name: 'Tiger' },
-    { emoji: '🐆', name: 'Cheetah' },
-    { emoji: '🐘', name: 'Elephant' },
-    { emoji: '🦅', name: 'Eagle' },
-    { emoji: '🐺', name: 'Wolf' },
-    { emoji: '🦊', name: 'Fox' },
-    { emoji: '🐻', name: 'Bear' },
-    { emoji: '🦈', name: 'Shark' },
-    { emoji: '🐎', name: 'Horse' },
+  // Tier symbols for repeat customers (customers with more than 1 invoice)
+  const tierSymbols = [
+    { emoji: '💎', name: 'Diamond' },
+    { emoji: '🏆', name: 'Platinum' },
+    { emoji: '🥇', name: 'Gold' },
+    { emoji: '🥈', name: 'Silver' },
+    { emoji: '🥉', name: 'Bronze' },
+    { emoji: '🔷', name: 'Copper' },
+    { emoji: '⚪', name: 'Iron' },
+    { emoji: '⚫', name: 'Basic' },
   ]
 
   useEffect(() => {
@@ -68,14 +66,14 @@ export default function Dashboard() {
       }
     })
     
-    // Filter only customers with more than 1 invoice and assign animal symbols
+    // Filter only customers with more than 1 invoice and assign tier symbols
     const repeatCustomers = Object.values(customerMap)
       .filter(customer => customer.invoiceCount > 1)
       .sort((a, b) => b.totalAmount - a.totalAmount)
       .slice(0, 10)
       .map((customer, index) => ({
         ...customer,
-        animal: animalSymbols[index] || { emoji: '🌟', name: 'Star' }
+        tier: tierSymbols[index] || { emoji: '⚫', name: 'Basic' }
       }))
     
     setCustomerStats(repeatCustomers)
@@ -124,7 +122,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Company-wise Performance with Animal Symbols */}
+      {/* Company-wise Performance with Tier Symbols */}
       <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
         <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-amber-50 to-orange-50">
           <h2 className="text-xl font-semibold text-gray-900">🏆 Top Repeat Customers</h2>
@@ -157,10 +155,10 @@ export default function Dashboard() {
                   #{index + 1}
                 </div>
                 
-                {/* Animal Symbol */}
+                {/* Tier Symbol */}
                 <div className="text-center mb-3">
-                  <span className="text-5xl">{customer.animal.emoji}</span>
-                  <p className="text-xs text-gray-500 mt-1">{customer.animal.name}</p>
+                  <span className="text-5xl">{customer.tier.emoji}</span>
+                  <p className="text-xs text-gray-500 mt-1">{customer.tier.name}</p>
                 </div>
                 
                 {/* Company Name */}
