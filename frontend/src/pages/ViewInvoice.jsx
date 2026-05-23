@@ -3,35 +3,19 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useInvoices } from '../contexts/InvoiceContext'
 import { useCustomers } from '../contexts/CustomerContext'
 import './InvoiceTemplate.css'
+import { useUI } from '../contexts/UIContext'
+import { useActionModal } from '../hooks/useActionModal'
 
 export default function ViewInvoice() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { selectedInvoice, loadInvoice, updateInvoice, deleteInvoice } = useInvoices()
   const { searchCustomers } = useCustomers()
+  const { showToast } = useUI()
+  const { requestPassword, requestDeleteConfirm, modalElement } = useActionModal()
 
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
-
-  // Password for edit actions
-  const checkPassword = () => {
-    const password = prompt('Enter password:')
-    if (password !== '1981') {
-      alert('Incorrect password!')
-      return false
-    }
-    return true
-  }
-
-  // Confirmation for delete action
-  const checkDeleteConfirmation = () => {
-    const confirmation = prompt('Type "DELETE" to continue:')
-    if (confirmation !== 'DELETE') {
-      alert('Incorrect! You must type DELETE to proceed.')
-      return false
-    }
-    return true
-  }
 
   useEffect(() => {
     const fetchInvoice = async () => {
@@ -78,21 +62,28 @@ export default function ViewInvoice() {
   }
 
   const handleDelete = async () => {
-    if (!checkDeleteConfirmation()) return
-    
-    if (window.confirm('Are you sure you want to delete this invoice?')) {
+    requestDeleteConfirm(async () => {
       try {
         await deleteInvoice(id)
+        showToast('Invoice deleted successfully.', 'success')
         navigate('/invoices')
       } catch (err) {
         console.error('Error deleting invoice:', err)
+        showToast('Failed to delete invoice.', 'error')
       }
-    }
+    }, {
+      title: 'Delete Invoice',
+      description: 'This will permanently remove the invoice and its line items.',
+      confirmText: 'Delete Invoice',
+    })
   }
 
   const handleEdit = () => {
-    if (!checkPassword()) return
-    setIsEditing(true)
+    requestPassword(() => setIsEditing(true), {
+      title: 'Edit Invoice',
+      description: 'Enter the admin password to edit this invoice.',
+      confirmText: 'Unlock',
+    })
   }
 
   if (loading) {
@@ -320,6 +311,7 @@ export default function ViewInvoice() {
 
         </div>
       </div>
+      {modalElement}
     </div>
   )
 }

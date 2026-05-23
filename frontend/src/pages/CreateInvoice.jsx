@@ -1,39 +1,32 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useInvoices } from '../contexts/InvoiceContext'
 import { useCustomers } from '../contexts/CustomerContext'
 import { useNavigate } from 'react-router-dom'
 import './InvoiceTemplate.css'
-
-// Password for all operations
-const ADMIN_PASSWORD = '1981'
-
-// Check password function
-const checkPassword = () => {
-  const pwd = prompt('Enter admin password to create invoice:')
-  if (pwd !== ADMIN_PASSWORD) {
-    alert('Incorrect password!')
-    return false
-  }
-  return true
-}
+import { useUI } from '../contexts/UIContext'
+import { useActionModal } from '../hooks/useActionModal'
 
 export default function CreateInvoice() {
   const navigate = useNavigate()
   const { createInvoice, getNextInvoiceNumber, getBatches } = useInvoices()
   const { customers, searchCustomers } = useCustomers()
+  const { showToast } = useUI()
+  const { requestPassword, requestConfirm, modalElement } = useActionModal()
   
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const hasPrompted = useRef(false)
 
   // Check password on component mount
   useEffect(() => {
-    if (!isAuthenticated) {
-      if (checkPassword()) {
-        setIsAuthenticated(true)
-      } else {
-        navigate('/invoices')
-      }
-    }
-  }, [])
+    if (isAuthenticated || hasPrompted.current) return
+    hasPrompted.current = true
+    requestPassword(() => setIsAuthenticated(true), {
+      title: 'Create Invoice',
+      description: 'Enter the admin password to create a new invoice.',
+      confirmText: 'Unlock',
+      onCancel: () => navigate('/invoices'),
+    })
+  }, [isAuthenticated, navigate, requestPassword])
 
   const [invoiceNo, setInvoiceNo] = useState('')
   const [currentBatch, setCurrentBatch] = useState('2025-2026')
@@ -145,7 +138,7 @@ export default function CreateInvoice() {
   // Handle save
   const handleSave = async () => {
     if (!customerName || items.length === 0) {
-      alert('Please enter customer name and at least one item')
+      showToast('Please enter customer name and at least one item.', 'error')
       return
     }
 
@@ -153,7 +146,7 @@ export default function CreateInvoice() {
     const validItems = items.filter(item => item.description && item.qty && item.rate)
     
     if (validItems.length === 0) {
-      alert('Please add at least one item with description, quantity, and rate')
+      showToast('Please add at least one item with description, quantity, and rate.', 'error')
       return
     }
 
@@ -178,19 +171,24 @@ export default function CreateInvoice() {
       const result = await createInvoice(invoiceData)
       
       if (result?.suggestedNumber) {
-        const useSuggested = confirm(`Invoice number ${invoiceNo} already exists. Would you like to use ${result.suggestedNumber} instead?`)
-        if (useSuggested) {
+        requestConfirm(() => {
           setInvoiceNo(result.suggestedNumber)
-          return // Don't navigate, let user save with new number
-        }
+          showToast(`Invoice number updated to ${result.suggestedNumber}.`, 'success')
+        }, {
+          title: 'Invoice Number Already Used',
+          description: `Invoice number ${invoiceNo} already exists. Use ${result.suggestedNumber} instead?`,
+          confirmText: 'Use Suggested',
+          cancelText: 'Keep Current',
+          intent: 'warning',
+        })
         return
       }
       
-      alert('Invoice saved successfully!')
+      showToast('Invoice saved successfully!', 'success')
       navigate('/invoices')
     } catch (err) {
       console.error('Error saving invoice:', err)
-      alert(`Failed to create invoice: ${err.message || 'Unknown error'}`)
+      showToast(`Failed to create invoice: ${err.message || 'Unknown error'}`, 'error')
     }
   }
 
@@ -234,6 +232,7 @@ export default function CreateInvoice() {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-xl text-gray-600">Authenticating...</div>
+        {modalElement}
       </div>
     )
   }
@@ -601,6 +600,7 @@ export default function CreateInvoice() {
           </div>
         </div>
       </div>
+      {modalElement}
     </div>
   )
 }

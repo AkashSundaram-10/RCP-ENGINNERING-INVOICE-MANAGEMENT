@@ -1,26 +1,8 @@
 import { useState, useMemo } from 'react'
 import { useInvoices } from '../contexts/InvoiceContext'
 import { useNavigate } from 'react-router-dom'
-
-// Check password for view/status actions
-const checkViewPassword = () => {
-  const pwd = prompt('Enter password:')
-  if (pwd !== '1981') {
-    alert('Incorrect password!')
-    return false
-  }
-  return true
-}
-
-// Check delete confirmation
-const checkDeleteConfirmation = () => {
-  const confirmation = prompt('Type "DELETE" to continue:')
-  if (confirmation !== 'DELETE') {
-    alert('Incorrect! You must type DELETE to proceed.')
-    return false
-  }
-  return true
-}
+import { useUI } from '../contexts/UIContext'
+import { useActionModal } from '../hooks/useActionModal'
 
 // Parse date from DD-MM-YYYY or YYYY-MM-DD format
 function parseDate(dateStr) {
@@ -54,6 +36,8 @@ function normalizeBatch(batch) {
 export default function AllInvoices() {
   const { invoices, loading, deleteInvoice, updateInvoiceStatus } = useInvoices()
   const navigate = useNavigate()
+  const { showToast } = useUI()
+  const { requestPassword, requestDeleteConfirm, modalElement } = useActionModal()
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedMonths, setExpandedMonths] = useState({})
 
@@ -94,29 +78,43 @@ export default function AllInvoices() {
   }
 
   const handleView = (id) => {
-    if (!checkViewPassword()) return
-    navigate(`/invoices/${id}`)
+    requestPassword(() => navigate(`/invoices/${id}`), {
+      title: 'View Invoice',
+      description: 'Enter the admin password to view invoice details.',
+      confirmText: 'Continue',
+    })
   }
 
   const handleDelete = async (id) => {
-    if (!checkDeleteConfirmation()) return
-    if (window.confirm('Are you sure you want to delete this invoice?')) {
+    requestDeleteConfirm(async () => {
       try {
         await deleteInvoice(id)
+        showToast('Invoice deleted successfully.', 'success')
       } catch (err) {
         console.error('Delete failed:', err)
+        showToast('Failed to delete invoice.', 'error')
       }
-    }
+    }, {
+      title: 'Delete Invoice',
+      description: 'This will permanently remove the invoice and its line items.',
+      confirmText: 'Delete Invoice',
+    })
   }
 
   const handleStatusToggle = async (id, currentStatus) => {
-    if (!checkViewPassword()) return
-    const newStatus = currentStatus === 'paid' ? 'pending' : 'paid'
-    try {
-      await updateInvoiceStatus(id, newStatus)
-    } catch (err) {
-      console.error('Status update failed:', err)
-    }
+    requestPassword(async () => {
+      const newStatus = currentStatus === 'paid' ? 'pending' : 'paid'
+      try {
+        await updateInvoiceStatus(id, newStatus)
+      } catch (err) {
+        console.error('Status update failed:', err)
+        showToast('Failed to update status.', 'error')
+      }
+    }, {
+      title: 'Update Payment Status',
+      description: 'Enter the admin password to change payment status.',
+      confirmText: 'Update Status',
+    })
   }
 
   return (
@@ -228,6 +226,7 @@ export default function AllInvoices() {
           })}
         </div>
       )}
+      {modalElement}
     </div>
   )
 }

@@ -1,8 +1,12 @@
 import { useState } from 'react'
 import { useCustomers } from '../contexts/CustomerContext'
+import { useUI } from '../contexts/UIContext'
+import { useActionModal } from '../hooks/useActionModal'
 
 export default function Customers() {
   const { customers, loading, deleteCustomer, createCustomer, updateCustomer, mergeCustomers } = useCustomers()
+  const { showToast } = useUI()
+  const { requestPassword, requestDeleteConfirm, requestConfirm, modalElement } = useActionModal()
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [formData, setFormData] = useState({
@@ -13,44 +17,34 @@ export default function Customers() {
     email: '',
   })
 
-  // Password for add/edit/merge actions
-  const checkPassword = () => {
-    const password = prompt('Enter password:')
-    if (password !== '1981') {
-      alert('Incorrect password!')
-      return false
-    }
-    return true
-  }
-
-  // Confirmation for delete action
-  const checkDeleteConfirmation = () => {
-    const confirmation = prompt('Type "DELETE" to continue:')
-    if (confirmation !== 'DELETE') {
-      alert('Incorrect! You must type DELETE to proceed.')
-      return false
-    }
-    return true
-  }
-
   const handleAddClick = () => {
-    if (!checkPassword()) return
-    setEditingId(null)
-    setFormData({ name: '', address: '', gstin: '', phone: '', email: '' })
-    setShowModal(true)
+    requestPassword(() => {
+      setEditingId(null)
+      setFormData({ name: '', address: '', gstin: '', phone: '', email: '' })
+      setShowModal(true)
+    }, {
+      title: 'Add Customer',
+      description: 'Enter the admin password to add a new customer.',
+      confirmText: 'Continue',
+    })
   }
 
   const handleEditClick = (customer) => {
-    if (!checkPassword()) return
-    setEditingId(customer.id)
-    setFormData({
-      name: customer.name,
-      address: customer.address || '',
-      gstin: customer.gstin || '',
-      phone: customer.phone || '',
-      email: customer.email || '',
+    requestPassword(() => {
+      setEditingId(customer.id)
+      setFormData({
+        name: customer.name,
+        address: customer.address || '',
+        gstin: customer.gstin || '',
+        phone: customer.phone || '',
+        email: customer.email || '',
+      })
+      setShowModal(true)
+    }, {
+      title: 'Edit Customer',
+      description: 'Enter the admin password to edit customer details.',
+      confirmText: 'Continue',
     })
-    setShowModal(true)
   }
 
   const handleChange = (e) => {
@@ -68,10 +62,10 @@ export default function Customers() {
         customer.name.toLowerCase().trim() === normalizedNewName
       )
       
-      if (isDuplicate) {
-        alert('A customer with this name already exists. Please use a different name.')
-        return
-      }
+    if (isDuplicate) {
+      showToast('A customer with this name already exists. Please use a different name.', 'error')
+      return
+    }
       
       if (editingId) {
         await updateCustomer(editingId, formData)
@@ -85,15 +79,19 @@ export default function Customers() {
   }
 
   const handleDelete = async (id) => {
-    if (!checkDeleteConfirmation()) return
-    
-    if (window.confirm('Are you sure you want to delete this customer?')) {
+    requestDeleteConfirm(async () => {
       try {
         await deleteCustomer(id)
+        showToast('Customer deleted successfully.', 'success')
       } catch (err) {
         console.error('Delete failed:', err)
+        showToast('Failed to delete customer.', 'error')
       }
-    }
+    }, {
+      title: 'Delete Customer',
+      description: 'This will permanently remove the customer and related invoices.',
+      confirmText: 'Delete Customer',
+    })
   }
 
   // Find duplicate customers (case-insensitive)
@@ -158,12 +156,28 @@ export default function Customers() {
                     </div>
                     <button
                       onClick={async () => {
-                        if (!checkPassword()) return
-                        if (window.confirm(`Merge all "${group[0].name}" duplicates into one? This will combine all invoices.`)) {
-                          const keepId = group[0].id
-                          const deleteIds = group.slice(1).map(c => c.id)
-                          await mergeCustomers(keepId, deleteIds)
-                        }
+                        requestPassword(() => {
+                          requestConfirm(async () => {
+                            try {
+                              const keepId = group[0].id
+                              const deleteIds = group.slice(1).map(c => c.id)
+                              await mergeCustomers(keepId, deleteIds)
+                              showToast(`Merged ${group.length} customers successfully.`, 'success')
+                            } catch (err) {
+                              console.error('Merge failed:', err)
+                              showToast('Failed to merge customers.', 'error')
+                            }
+                          }, {
+                            title: 'Merge Duplicate Customers',
+                            description: `Merge all "${group[0].name}" duplicates into one? This will combine all invoices.`,
+                            confirmText: 'Merge Customers',
+                            intent: 'warning',
+                          })
+                        }, {
+                          title: 'Merge Customers',
+                          description: 'Enter the admin password to merge duplicate customers.',
+                          confirmText: 'Continue',
+                        })
                       }}
                       className="mt-2 px-3 py-1 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700"
                     >
@@ -304,6 +318,7 @@ export default function Customers() {
           </div>
         </div>
       )}
+      {modalElement}
     </div>
   )
 }
