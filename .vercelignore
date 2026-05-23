@@ -1,0 +1,6 @@
+backend/
+*.md
+.env
+.env.local
+.git/
+test-db-connection.js
