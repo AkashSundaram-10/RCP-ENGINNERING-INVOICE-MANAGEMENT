@@ -15,7 +15,6 @@ export default function ViewInvoice() {
   const { requestPassword, requestDeleteConfirm, modalElement } = useActionModal()
 
   const [loading, setLoading] = useState(true)
-  const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
     const fetchInvoice = async () => {
@@ -79,7 +78,7 @@ export default function ViewInvoice() {
   }
 
   const handleEdit = () => {
-    requestPassword(() => setIsEditing(true), {
+    requestPassword(() => navigate(`/invoices/edit/${id}`), {
       title: 'Edit Invoice',
       description: 'Enter the admin password to edit this invoice.',
       confirmText: 'Unlock',
@@ -260,7 +259,16 @@ export default function ViewInvoice() {
                   <tr><td>Subtotal</td><td>₹ {(invoice.subtotal || 0).toFixed(2)}</td></tr>
                   <tr><td>SGST (9%)</td><td>₹ {(invoice.sgst || 0).toFixed(2)}</td></tr>
                   <tr><td>CGST (9%)</td><td>₹ {(invoice.cgst || 0).toFixed(2)}</td></tr>
-                  <tr className="grand"><td>Grand Total</td><td>₹ {(invoice.grand_total || 0).toFixed(2)}</td></tr>
+                  {(() => {
+                    const rawTotal = (invoice.subtotal || 0) + (invoice.sgst || 0) + (invoice.cgst || 0);
+                    const displayGrandTotal = Math.round(invoice.grand_total || rawTotal);
+                    const roundOff = displayGrandTotal - rawTotal;
+                    if (Math.abs(roundOff) > 0.001) {
+                      return <tr><td>Round Off</td><td>₹ {roundOff > 0 ? '+' : ''}{roundOff.toFixed(2)}</td></tr>;
+                    }
+                    return null;
+                  })()}
+                  <tr className="grand"><td>Grand Total</td><td>₹ {Math.round(invoice.grand_total || 0)}</td></tr>
                 </tbody>
               </table>
             </div>
@@ -268,7 +276,7 @@ export default function ViewInvoice() {
 
           {/* Amount in Words */}
           <div className="amount-words">
-            Amount in Words: <span>Rupees {numberToWords(Math.floor(invoice.grand_total || 0))}</span>
+            Amount in Words: <span>Rupees {numberToWords(Math.round(invoice.grand_total || 0))}</span>
           </div>
 
           {/* Bank Details + Terms & Conditions */}

@@ -153,13 +153,13 @@ export default function AllInvoices() {
                   className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-left flex justify-between items-center transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-white font-bold text-lg">{batchKey}</span>
-                    <span className="text-blue-100 text-sm">({batchInvoices.length} invoices)</span>
-                    <span className="text-white text-sm">
+                    <span className="text-white font-bold text-xl">{batchKey}</span>
+                    <span className="text-blue-100 text-lg">({batchInvoices.length} invoices)</span>
+                    <span className="text-white text-lg">
                       {isExpanded ? '▼' : '▶'}
                     </span>
                   </div>
-                  <div className="flex gap-6 text-sm">
+                  <div className="flex gap-6 text-lg">
                     <div className="text-green-100 font-medium">Paid: ₹{(totalPaid/100000).toFixed(2)}L</div>
                     <div className="text-amber-100 font-medium">Pending: ₹{(totalPending/100000).toFixed(2)}L</div>
                     <div className="text-white font-bold">Total: ₹{(totalRevenue/100000).toFixed(2)}L</div>
@@ -171,12 +171,12 @@ export default function AllInvoices() {
                   <table className="w-full">
                     <thead className="bg-blue-50 border-t border-gray-200">
                       <tr>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">#</th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Date</th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Customer</th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Amount</th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
+                        <th className="px-6 py-3 text-left text-lg font-semibold text-gray-900">#</th>
+                        <th className="px-6 py-3 text-left text-lg font-semibold text-gray-900">Date</th>
+                        <th className="px-6 py-3 text-left text-lg font-semibold text-gray-900">Customer</th>
+                        <th className="px-6 py-3 text-left text-lg font-semibold text-gray-900">Amount</th>
+                        <th className="px-6 py-3 text-left text-lg font-semibold text-gray-900">Status</th>
+                        <th className="px-6 py-3 text-left text-lg font-semibold text-gray-900">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -184,13 +184,13 @@ export default function AllInvoices() {
                         .sort((a, b) => parseInt(b.invoice_no) - parseInt(a.invoice_no))
                         .map((invoice) => (
                         <tr key={invoice.id} className="border-t border-gray-200 hover:bg-gray-50">
-                          <td className="px-6 py-3 text-sm font-medium text-blue-900">{invoice.invoice_no}</td>
-                          <td className="px-6 py-3 text-sm text-gray-700">{formatDate(invoice.date)}</td>
-                          <td className="px-6 py-3 text-sm text-gray-700">{invoice.customer_name}</td>
-                          <td className="px-6 py-3 text-sm font-medium text-gray-900">₹{invoice.grand_total}</td>
-                          <td className="px-6 py-3 text-sm">
+                          <td className="px-6 py-3 text-lg font-medium text-blue-900">{invoice.invoice_no}</td>
+                          <td className="px-6 py-3 text-lg text-gray-700">{formatDate(invoice.date)}</td>
+                          <td className="px-6 py-3 text-lg text-gray-700">{invoice.customer_name}</td>
+                          <td className="px-6 py-3 text-lg font-medium text-gray-900">₹{Math.round(invoice.grand_total || 0)}</td>
+                          <td className="px-6 py-3 text-lg">
                             <span
-                              className={`inline-block px-3 py-1 rounded-full text-xs font-medium cursor-pointer ${
+                              className={`inline-block px-3 py-1 rounded-full text-base font-medium cursor-pointer ${
                                 invoice.payment_status === 'paid'
                                   ? 'bg-green-100 text-green-700'
                                   : invoice.payment_status === 'pending'
@@ -202,16 +202,16 @@ export default function AllInvoices() {
                               {invoice.payment_status?.charAt(0).toUpperCase() + invoice.payment_status?.slice(1)}
                             </span>
                           </td>
-                          <td className="px-6 py-3 text-sm space-x-2">
+                          <td className="px-6 py-3 text-lg space-x-2">
                             <button
                               onClick={() => handleView(invoice.id)}
-                              className="inline-block px-3 py-1 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700"
+                              className="inline-block px-3 py-1 bg-blue-600 text-white rounded text-base font-medium hover:bg-blue-700"
                             >
                               View
                             </button>
                             <button
                               onClick={() => handleDelete(invoice.id)}
-                              className="inline-block px-3 py-1 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700"
+                              className="inline-block px-3 py-1 bg-red-600 text-white rounded text-base font-medium hover:bg-red-700"
                             >
                               Delete
                             </button>

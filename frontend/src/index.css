@@ -4,6 +4,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Responsive base font-size for improved mobile readability */
+html {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 18px; /* Scale up rem units by ~12.5% on tablets */
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 20px; /* Scale up rem units by 25% on small mobile phones */
+  }
+}
+
+
 /* Print styles for A4 invoice */
 @page {
   size: 210mm 297mm;

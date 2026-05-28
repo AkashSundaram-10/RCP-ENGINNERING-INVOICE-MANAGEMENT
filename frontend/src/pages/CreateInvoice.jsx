@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { useInvoices } from '../contexts/InvoiceContext'
 import { useCustomers } from '../contexts/CustomerContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import './InvoiceTemplate.css'
 import { useUI } from '../contexts/UIContext'
 import { useActionModal } from '../hooks/useActionModal'
 
 export default function CreateInvoice() {
+  const { id } = useParams()
+  const isEditMode = Boolean(id)
   const navigate = useNavigate()
-  const { createInvoice, getNextInvoiceNumber, getBatches } = useInvoices()
+  const { createInvoice, updateInvoice, loadInvoice, selectedInvoice, getNextInvoiceNumber, getBatches } = useInvoices()
   const { customers, searchCustomers } = useCustomers()
   const { showToast } = useUI()
   const { requestPassword, requestConfirm, modalElement } = useActionModal()
@@ -21,8 +23,8 @@ export default function CreateInvoice() {
     if (isAuthenticated || hasPrompted.current) return
     hasPrompted.current = true
     requestPassword(() => setIsAuthenticated(true), {
-      title: 'Create Invoice',
-      description: 'Enter the admin password to create a new invoice.',
+      title: isEditMode ? 'Edit Invoice' : 'Create Invoice',
+      description: isEditMode ? 'Enter the admin password to edit this invoice.' : 'Enter the admin password to create a new invoice.',
       confirmText: 'Unlock',
       onCancel: () => navigate('/invoices'),
     })
@@ -70,6 +72,7 @@ export default function CreateInvoice() {
   // Load next invoice number on mount and when batch changes
   useEffect(() => {
     const loadData = async () => {
+      if (isEditMode) return // Skip fetching next number in edit mode
       // Load next number for current batch
       const data = await getNextInvoiceNumber(currentBatch)
       setInvoiceNo(data.next_number || '001')
@@ -77,7 +80,29 @@ export default function CreateInvoice() {
     if (currentBatch) {
       loadData()
     }
-  }, [getNextInvoiceNumber, currentBatch])
+  }, [getNextInvoiceNumber, currentBatch, isEditMode])
+
+  // Load existing invoice if in edit mode
+  useEffect(() => {
+    if (isEditMode && id) {
+      loadInvoice(id)
+    }
+  }, [id, isEditMode, loadInvoice])
+
+  // Populate form with existing invoice data
+  useEffect(() => {
+    if (isEditMode && selectedInvoice && String(selectedInvoice.id) === String(id)) {
+      setInvoiceNo(selectedInvoice.invoice_no)
+      setCurrentBatch(selectedInvoice.batch || '2025-2026')
+      setDate(selectedInvoice.date ? new Date(selectedInvoice.date).toISOString().split('T')[0] : '')
+      setCustomerId(selectedInvoice.customer_id || '')
+      setCustomerName(selectedInvoice.customer_name || '')
+      setCustomerAddress(selectedInvoice.customer_address || '')
+      setCustomerGstin(selectedInvoice.customer_gstin || '')
+      setCustomerPhone(selectedInvoice.customer_phone || '')
+      setItems(selectedInvoice.items && selectedInvoice.items.length > 0 ? selectedInvoice.items : [{ description: '', hsn_code: '998898', qty: 1, rate: 0 }])
+    }
+  }, [isEditMode, selectedInvoice, id])
 
   // Handle customer search
   const handleCustomerSearch = async (value) => {
@@ -128,9 +153,11 @@ export default function CreateInvoice() {
     const tax = subtotal * 0.09 // 9% SGST
     const sgst = tax
     const cgst = tax
-    const grandTotal = subtotal + sgst + cgst
+    const rawTotal = subtotal + sgst + cgst
+    const grandTotal = Math.round(rawTotal)
+    const roundOff = grandTotal - rawTotal
 
-    return { subtotal, sgst, cgst, grandTotal }
+    return { subtotal, sgst, cgst, grandTotal, roundOff }
   }
 
   const totals = calculateTotals()
@@ -168,6 +195,14 @@ export default function CreateInvoice() {
 
     try {
       console.log('Saving invoice:', invoiceData)
+      
+      if (isEditMode) {
+        await updateInvoice(id, invoiceData)
+        showToast('Invoice updated successfully!', 'success')
+        navigate('/invoices')
+        return
+      }
+
       const result = await createInvoice(invoiceData)
       
       if (result?.suggestedNumber) {
@@ -550,7 +585,10 @@ export default function CreateInvoice() {
                   <tr><td>Subtotal</td><td>₹ {totals.subtotal.toFixed(2)}</td></tr>
                   <tr><td>SGST (9%)</td><td>₹ {totals.sgst.toFixed(2)}</td></tr>
                   <tr><td>CGST (9%)</td><td>₹ {totals.cgst.toFixed(2)}</td></tr>
-                  <tr className="grand"><td>Grand Total</td><td>₹ {totals.grandTotal.toFixed(2)}</td></tr>
+                  {Math.abs(totals.roundOff) > 0.001 && (
+                    <tr><td>Round Off</td><td>₹ {totals.roundOff > 0 ? '+' : ''}{totals.roundOff.toFixed(2)}</td></tr>
+                  )}
+                  <tr className="grand"><td>Grand Total</td><td>₹ {totals.grandTotal}</td></tr>
                 </tbody>
               </table>
             </div>
