@@ -202,19 +202,21 @@ export default function AllInvoices() {
                               {invoice.payment_status?.charAt(0).toUpperCase() + invoice.payment_status?.slice(1)}
                             </span>
                           </td>
-                          <td className="px-6 py-3 text-lg space-x-2">
-                            <button
-                              onClick={() => handleView(invoice.id)}
-                              className="inline-block px-3 py-1 bg-blue-600 text-white rounded text-base font-medium hover:bg-blue-700"
-                            >
-                              View
-                            </button>
-                            <button
-                              onClick={() => handleDelete(invoice.id)}
-                              className="inline-block px-3 py-1 bg-red-600 text-white rounded text-base font-medium hover:bg-red-700"
-                            >
-                              Delete
-                            </button>
+                          <td className="px-6 py-3">
+                            <div className="flex items-center gap-3">
+                              <button
+                                onClick={() => handleView(invoice.id)}
+                                className="px-4 py-1.5 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 shadow-sm whitespace-nowrap"
+                              >
+                                View
+                              </button>
+                              <button
+                                onClick={() => handleDelete(invoice.id)}
+                                className="px-4 py-1.5 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 shadow-sm whitespace-nowrap"
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
