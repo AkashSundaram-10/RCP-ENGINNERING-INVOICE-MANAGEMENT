@@ -23,7 +23,7 @@
   font-size: 11px;
   color: #1a1a1a;
   margin: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Top Accent Stripe */
@@ -172,7 +172,7 @@
 }
 
 .bill-to .customer-name {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   color: #111;
   margin-bottom: 4px;
@@ -180,8 +180,8 @@
 }
 
 .bill-to .customer-addr {
-  font-size: 11px;
-  color: #4b5563;
+  font-size: 13px;
+  color: #333;
   line-height: 1.4;
   margin-bottom: 6px;
 }
@@ -342,10 +342,10 @@
   border-bottom: none;
 }
 
-/* Amount in Words - another 30% down from current position */
+/* Amount in Words */
 .amount-words {
   padding: 4px 16px;
-  margin-top: 80px;
+  margin-top: 20px;
   background: #f1f5f9;
   font-size: 8px;
   font-weight: 600;
@@ -359,11 +359,11 @@
   color: #1a3c8f;
 }
 
-/* Bank Details and Terms Section - another 30% down */
+/* Bank Details and Terms Section */
 .bank-terms-section {
   display: flex;
   padding: 8px 16px;
-  margin-top: 35px;
+  margin-top: 15px;
   gap: 8px;
   background: #fff;
   flex-shrink: 0;
@@ -439,21 +439,22 @@
   margin: 0;
 }
 
-/* Footer Section - another 30% down */
+/* Footer Section */
 .footer-section {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 8px 16px 30px;
-  margin-top: 25px;
+  padding: 8px 16px 20px;
+  margin-top: 15px;
   background: #fff;
   flex-shrink: 0;
 }
 
 .footer-left {
   color: #444;
-  font-size: 8px;
-  line-height: 1.4;
+  font-size: 11px;
+  line-height: 1.5;
+  font-weight: 500;
 }
 
 .signatory {
@@ -464,18 +465,19 @@
 }
 
 .signatory .for-text {
-  font-size: 7px;
-  color: #666;
-  margin-bottom: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
 }
 
 .signatory .sig-line {
-  font-size: 8px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   color: #1a3c8f;
-  border-bottom: 1px solid #333;
-  padding-bottom: 1px;
-  min-width: 80px;
+  border-bottom: 2px solid #333;
+  padding-bottom: 3px;
+  min-width: 140px;
   text-align: center;
 }
 
@@ -536,6 +538,16 @@
     padding: 10px 12px !important;
   }
 
+  .bill-to .customer-name {
+    font-size: 16px !important;
+    color: #111 !important;
+  }
+
+  .bill-to .customer-addr {
+    font-size: 13px !important;
+    color: #333 !important;
+  }
+
   .bill-to .customer-gstin {
     font-size: 13px !important;
     background: #fef2f2 !important;
@@ -588,8 +600,8 @@
 
   .amount-words {
     padding: 3px 16px !important;
-    margin-top: 60px !important;
-    font-size: 10px !important;
+    margin-top: 10px !important;
+    font-size: 12px !important;
   }
 
   .totals-wrapper {
@@ -598,16 +610,16 @@
 
   .bank-terms-section {
     padding: 6px 16px !important;
-    margin-top: 25px !important;
+    margin-top: 10px !important;
   }
 
   .bank-details table td,
   .terms ol {
-    font-size: 9px !important;
+    font-size: 10px !important;
   }
 
   .footer-section {
-    padding: 6px 16px 25px !important;
-    margin-top: 20px !important;
+    padding: 6px 16px 15px !important;
+    margin-top: 10px !important;
   }
 }
