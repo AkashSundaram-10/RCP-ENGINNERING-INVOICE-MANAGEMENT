@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useCustomers } from '../contexts/CustomerContext'
 import { useUI } from '../contexts/UIContext'
 import { useActionModal } from '../hooks/useActionModal'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 export default function Customers() {
   const { customers, loading, deleteCustomer, createCustomer, updateCustomer, mergeCustomers } = useCustomers()
@@ -133,7 +134,7 @@ export default function Customers() {
 
       {/* Customers Table */}
       {loading ? (
-        <div className="text-center py-8 text-gray-500">Loading...</div>
+        <LoadingSpinner message="Loading your customers..." />
       ) : customers.length === 0 ? (
         <div className="text-center py-8 bg-white rounded-lg">
           <p className="text-gray-500">No customers yet. Add your first customer!</p>

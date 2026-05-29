@@ -3,6 +3,7 @@ import { useInvoices } from '../contexts/InvoiceContext'
 import { useNavigate } from 'react-router-dom'
 import { useUI } from '../contexts/UIContext'
 import { useActionModal } from '../hooks/useActionModal'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 // Parse date from DD-MM-YYYY or YYYY-MM-DD format
 function parseDate(dateStr) {
@@ -132,7 +133,7 @@ export default function AllInvoices() {
       </div>
 
       {loading ? (
-        <div className="text-center py-8 text-gray-500">Loading...</div>
+        <LoadingSpinner message="Loading your invoices..." />
       ) : Object.keys(groupedInvoices).length === 0 ? (
         <div className="text-center py-8 text-gray-500">No invoices found</div>
       ) : (

@@ -5,6 +5,7 @@ import { useCustomers } from '../contexts/CustomerContext'
 import './InvoiceTemplate.css'
 import { useUI } from '../contexts/UIContext'
 import { useActionModal } from '../hooks/useActionModal'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 export default function ViewInvoice() {
   const { id } = useParams()
@@ -86,11 +87,7 @@ export default function ViewInvoice() {
   }
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-xl text-gray-600">Loading invoice...</div>
-      </div>
-    )
+    return <LoadingSpinner message="Fetching invoice details..." />
   }
 
   if (!selectedInvoice) {

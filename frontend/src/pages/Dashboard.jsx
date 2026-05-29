@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useInvoices } from '../contexts/InvoiceContext'
+import LoadingSpinner from '../components/LoadingSpinner'
 
 export default function Dashboard() {
   const { invoices, loading } = useInvoices()
@@ -130,7 +131,7 @@ export default function Dashboard() {
         </div>
         
         {loading ? (
-          <div className="p-6 text-center text-gray-500">Loading...</div>
+          <LoadingSpinner message="Loading your dashboard statistics..." />
         ) : customerStats.length === 0 ? (
           <div className="p-6 text-center text-gray-500">No repeat customers yet</div>
         ) : (
@@ -188,7 +189,7 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <div className="p-6 text-center text-gray-500">Loading...</div>
+          <LoadingSpinner message="Fetching recent invoices..." />
         ) : recentInvoices.length === 0 ? (
           <div className="p-6 text-center text-gray-500">No invoices yet</div>
         ) : (
