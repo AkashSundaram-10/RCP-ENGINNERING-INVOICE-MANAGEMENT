@@ -338,7 +338,7 @@
   background: #1a3c8f;
   color: #fff;
   font-weight: 700;
-  font-size: 10px;
+  font-size: 16px;
   border-bottom: none;
 }
 
@@ -621,5 +621,11 @@
   .footer-section {
     padding: 6px 16px 15px !important;
     margin-top: 10px !important;
+  }
+}
+
+@media print {
+  .totals-table tr.grand td {
+    font-size: 16px !important;
   }
 }

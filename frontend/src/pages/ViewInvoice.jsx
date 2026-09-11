@@ -240,8 +240,8 @@ export default function ViewInvoice() {
                     </tr>
                   )
                 })}
-                {/* Very big description box - 25 rows total */}
-                {Array.from({ length: Math.max(0, 25 - (invoice.items?.length || 0)) }).map((_, idx) => (
+                {/* Very big description box - 15 rows total */}
+                {Array.from({ length: Math.max(0, 15 - (invoice.items?.length || 0)) }).map((_, idx) => (
                   <tr key={`empty-${idx}`} className="empty-row">
                     <td></td><td></td><td></td><td></td><td></td><td></td>
                   </tr>

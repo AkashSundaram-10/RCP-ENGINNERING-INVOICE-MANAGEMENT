@@ -569,8 +569,8 @@ export default function CreateInvoice() {
                     </tr>
                   )
                 })}
-                {/* Very big description box - 25 rows total */}
-                {Array.from({ length: Math.max(0, 25 - items.length) }).map((_, idx) => (
+                {/* Very big description box - 15 rows total */}
+                {Array.from({ length: Math.max(0, 15 - items.length) }).map((_, idx) => (
                   <tr key={`empty-${idx}`} className="empty-row">
                     <td></td><td></td><td></td><td></td><td></td><td></td>
                   </tr>
