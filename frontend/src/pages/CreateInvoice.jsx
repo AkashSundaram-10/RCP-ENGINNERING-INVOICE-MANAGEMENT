@@ -73,7 +73,7 @@ export default function CreateInvoice() {
   const [activeItemDropdown, setActiveItemDropdown] = useState(null)
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/products')
+    fetch('/api/products')
       .then(res => res.json())
       .then(data => setAllProducts(data))
       .catch(err => console.error('Failed to load products', err))
@@ -687,6 +687,8 @@ export default function CreateInvoice() {
     </div>
   )
 }
+
+
 
 
 

@@ -68,22 +68,22 @@ export default function Layout({ children }) {
       </header>
 
       {/* Navigation Tabs - Full Width */}
-      <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40 no-print">
-        <div className="w-full px-8 py-3">
-          <div className="flex space-x-4 justify-center">
+      <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40 no-print overflow-x-auto">
+        <div className="w-full px-4 md:px-8 py-2 md:py-3 min-w-max">
+          <div className="flex space-x-2 md:space-x-4 justify-center">
             {tabs.map((tab) => {
               const active = isTabActive(tab.path)
               return (
                 <button
                   key={tab.path}
                   onClick={() => navigate(tab.path)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-base transition-all duration-300 ${
+                  className={`flex items-center gap-1.5 md:gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold text-sm md:text-base transition-all duration-300 whitespace-nowrap ${
                     active
-                      ? 'bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg shadow-blue-900/30 transform -translate-y-0.5'
-                      : 'bg-transparent text-gray-600 hover:bg-blue-50 hover:text-blue-800 hover:-translate-y-0.5 hover:shadow-sm border border-transparent hover:border-blue-100'
+                      ? 'bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-lg shadow-blue-900/30 transform md:-translate-y-0.5'
+                      : 'bg-transparent text-gray-600 hover:bg-blue-50 hover:text-blue-800 hover:shadow-sm border border-transparent hover:border-blue-100'
                   }`}
                 >
-                  {tab.icon}
+                  <span className="[&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-5 md:[&>svg]:h-5 flex-shrink-0">{tab.icon}</span>
                   {tab.name}
                 </button>
               )
@@ -114,4 +114,5 @@ export default function Layout({ children }) {
     </div>
   )
 }
+
 
