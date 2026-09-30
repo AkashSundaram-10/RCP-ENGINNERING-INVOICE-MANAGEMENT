@@ -69,6 +69,16 @@ export default function CreateInvoice() {
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false)
   const [filteredCustomers, setFilteredCustomers] = useState([])
 
+  const [allProducts, setAllProducts] = useState([])
+  const [activeItemDropdown, setActiveItemDropdown] = useState(null)
+
+  useEffect(() => {
+    fetch('http://localhost:3001/api/products')
+      .then(res => res.json())
+      .then(data => setAllProducts(data))
+      .catch(err => console.error('Failed to load products', err))
+  }, [])
+
   // Load next invoice number on mount and when batch changes
   useEffect(() => {
     const loadData = async () => {
@@ -388,7 +398,7 @@ export default function CreateInvoice() {
         {/* Line Items */}
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-blue-900 mb-4">Line Items</h3>
-          <div className="overflow-x-auto">
+          <div className="overflow-visible">
             <table className="w-full text-sm">
               <thead className="bg-amber-100 rounded">
                 <tr>
@@ -406,13 +416,48 @@ export default function CreateInvoice() {
                   return (
                     <tr key={idx} className="border-b border-gray-200">
                       <td className="px-3 py-2">
-                        <textarea
-                          value={item.description}
-                          onChange={e => handleItemChange(idx, 'description', e.target.value)}
-                          rows="2"
-                          className="w-full px-2 py-1 border border-gray-300 rounded text-xs resize-none"
-                        />
-                      </td>
+  <div className="relative">
+    <textarea
+      value={item.description}
+      onChange={e => {
+        handleItemChange(idx, 'description', e.target.value)
+        setActiveItemDropdown(idx)
+      }}
+      onFocus={() => setActiveItemDropdown(idx)}
+      onBlur={() => setTimeout(() => setActiveItemDropdown(null), 200)}
+      rows="2"
+      className="w-full px-2 py-1 border border-gray-300 rounded text-xs resize-none"
+    />
+    {activeItemDropdown === idx && (
+      <div className="absolute z-50 w-[350px] left-0 bg-white border border-gray-300 shadow-lg rounded mt-1 max-h-48 overflow-y-auto">
+        {allProducts
+          .filter(p => p.name && p.name.toLowerCase().includes(item.description.toLowerCase()))
+          .slice(0, 15)
+          .map((p, pIdx) => (
+            <div
+              key={`${p.id}-${pIdx}`}
+              className="px-3 py-2 text-xs hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                handleItemChange(idx, 'description', p.name);
+                handleItemChange(idx, 'rate', p.price);
+                setActiveItemDropdown(null);
+              }}
+            >
+              <div className="font-semibold text-gray-800">{p.name}</div>
+              <div className="text-gray-500 flex justify-between mt-1">
+                <span>{p.company}</span>
+                <span className="font-mono text-blue-600">₹{Number(p.price).toFixed(2)}</span>
+              </div>
+            </div>
+          ))}
+        {allProducts.filter(p => p.name && p.name.toLowerCase().includes(item.description.toLowerCase())).length === 0 && (
+          <div className="px-3 py-2 text-xs text-gray-500 italic">No matching items found</div>
+        )}
+      </div>
+    )}
+  </div>
+</td>
                       <td className="px-3 py-2">
                         <input
                           type="text"
@@ -642,3 +687,7 @@ export default function CreateInvoice() {
     </div>
   )
 }
+
+
+
+

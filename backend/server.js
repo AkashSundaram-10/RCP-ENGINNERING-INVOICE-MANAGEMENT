@@ -34,10 +34,12 @@ async function startServer() {
     // Import routes after database is initialized
     const invoicesRouter = require('./routes/invoices');
     const customersRouter = require('./routes/customers');
+    const productsRouter = require('./routes/products');
 
     // API Routes
     app.use('/api/invoices', invoicesRouter);
     app.use('/api/customers', customersRouter);
+    app.use('/api/products', productsRouter);
 
     app.listen(PORT, () => {
       console.log(`
@@ -63,3 +65,4 @@ async function startServer() {
 }
 
 startServer();
+

@@ -6,6 +6,7 @@ import CreateInvoice from './pages/CreateInvoice'
 import ViewInvoice from './pages/ViewInvoice'
 import Customers from './pages/Customers'
 import Analytics from './pages/Analytics'
+import PriceChart from './pages/PriceChart'
 
 import { InvoiceProvider } from './contexts/InvoiceContext'
 import { CustomerProvider } from './contexts/CustomerContext'
@@ -21,6 +22,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/invoices" element={<AllInvoices />} />
+                <Route path="/price-chart" element={<PriceChart />} />
                 <Route path="/invoices/create" element={<CreateInvoice />} />
                 <Route path="/invoices/edit/:id" element={<CreateInvoice />} />
                 <Route path="/invoices/:id" element={<ViewInvoice />} />
@@ -37,3 +39,4 @@ function App() {
 }
 
 export default App
+
