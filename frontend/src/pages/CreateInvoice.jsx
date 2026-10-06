@@ -69,11 +69,12 @@ export default function CreateInvoice() {
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false)
   const [filteredCustomers, setFilteredCustomers] = useState([])
 
+  const API_URL = import.meta.env.VITE_API_BASE_URL || '/api';
   const [allProducts, setAllProducts] = useState([])
   const [activeItemDropdown, setActiveItemDropdown] = useState(null)
 
   useEffect(() => {
-    fetch('/api/products')
+    fetch(`${API_URL}/products`)
       .then(res => res.json())
       .then(data => setAllProducts(data))
       .catch(err => console.error('Failed to load products', err))
@@ -687,6 +688,10 @@ export default function CreateInvoice() {
     </div>
   )
 }
+
+
+
+
 
 
 

@@ -6,9 +6,10 @@ export default function PriceChart() {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_BASE_URL || '/api';
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/products');
+        const response = await fetch(`${API_URL}/products`);
         if (response.ok) {
           const data = await response.json();
           setProducts(data);
@@ -97,6 +98,10 @@ export default function PriceChart() {
     </div>
   );
 }
+
+
+
+
 
 
 
