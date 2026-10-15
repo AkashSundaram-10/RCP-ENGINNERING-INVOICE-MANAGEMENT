@@ -26,13 +26,19 @@ export default function PriceChart() {
     fetchProducts();
   }, []);
 
-  const filteredProducts = products.filter(product => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      (product.name && product.name.toLowerCase().includes(searchLower)) ||
-      (product.company && product.company.toLowerCase().includes(searchLower))
-    );
-  });
+  const filteredProducts = products
+    .filter(product => {
+      const company = (product.company || '').toLowerCase();
+      // Remove all items related to EN EM INDUSTRIES on this page
+      return !company.includes('en em') && !company.includes('enem');
+    })
+    .filter(product => {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        (product.name && product.name.toLowerCase().includes(searchLower)) ||
+        (product.company && product.company.toLowerCase().includes(searchLower))
+      );
+    });
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-[calc(100vh-8rem)]">
@@ -43,7 +49,7 @@ export default function PriceChart() {
         </div>
         
         {/* Search Input */}
-        <div className="relative w-full sm:wm72">
+        <div className="relative w-full sm:w-72">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -66,7 +72,7 @@ export default function PriceChart() {
           <table className="min-w-full text-left border-collapse">
             <thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
               <tr>
-                <th className="px-6 py-4 text-|l font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Product Item</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Product Item</th>
                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Price (1 Piece)</th>
                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-200">Company</th>
               </tr>
@@ -75,7 +81,7 @@ export default function PriceChart() {
               {filteredProducts.length === 0 ? (
                 <tr>
                   <td colSpan="3" className="px-6 py-8 text-center text-gray-500">
-                    {searchQuery ? "No matching products found." : "No products found in the database."}
+                    {searchQuery ? 'No matching products found.' : 'No products found in the database.'}
                   </td>
                 </tr>
               ) : (
@@ -98,10 +104,3 @@ export default function PriceChart() {
     </div>
   );
 }
-
-
-
-
-
-
-

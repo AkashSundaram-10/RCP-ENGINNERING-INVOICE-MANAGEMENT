@@ -106,20 +106,23 @@ export function InvoiceProvider({ children }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(invoiceData)
       })
-      if (!res.ok) throw new Error('Failed to update invoice')
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || 'Failed to update invoice')
+      }
       const updated = await res.json()
-      setInvoices(prev => prev.map(inv => inv.id === id ? updated : inv))
+      await loadInvoices()
       setSelectedInvoice(updated)
       showToast('Invoice updated successfully', 'success')
       return updated
     } catch (err) {
       setError(err.message)
-      showToast('Failed to update invoice', 'error')
+      showToast(err.message || 'Failed to update invoice', 'error')
       throw err
     } finally {
       setLoading(false)
     }
-  }, [showToast])
+  }, [showToast, loadInvoices, API_URL])
 
   // Delete invoice
   const deleteInvoice = useCallback(async (id) => {
@@ -128,17 +131,20 @@ export function InvoiceProvider({ children }) {
       const res = await fetch(`${API_URL}/invoices/${id}`, {
         method: 'DELETE'
       })
-      if (!res.ok) throw new Error('Failed to delete invoice')
-      setInvoices(prev => prev.filter(inv => inv.id !== id))
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData.error || 'Failed to delete invoice')
+      }
+      await loadInvoices()
       showToast('Invoice deleted successfully', 'success')
     } catch (err) {
       setError(err.message)
-      showToast('Failed to delete invoice', 'error')
+      showToast(err.message || 'Failed to delete invoice', 'error')
       throw err
     } finally {
       setLoading(false)
     }
-  }, [showToast])
+  }, [showToast, loadInvoices, API_URL])
 
   // Update payment status
   const updateInvoiceStatus = useCallback(async (id, status) => {

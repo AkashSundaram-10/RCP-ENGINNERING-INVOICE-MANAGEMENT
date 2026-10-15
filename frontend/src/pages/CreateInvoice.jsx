@@ -6,6 +6,26 @@ import './InvoiceTemplate.css'
 import { useUI } from '../contexts/UIContext'
 import { useActionModal } from '../hooks/useActionModal'
 
+// Helper to format date string to YYYY-MM-DD for date input
+function formatDateForInput(dateStr) {
+  if (!dateStr) return '';
+  if (typeof dateStr === 'string' && dateStr.includes('-')) {
+    const parts = dateStr.split('-');
+    if (parts[0].length === 4) {
+      return dateStr.substring(0, 10);
+    }
+    if (parts[0].length <= 2 && parts.length === 3) {
+      const [day, month, year] = parts;
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+  }
+  const d = new Date(dateStr);
+  if (!isNaN(d.getTime())) {
+    return d.toISOString().split('T')[0];
+  }
+  return '';
+}
+
 export default function CreateInvoice() {
   const { id } = useParams()
   const isEditMode = Boolean(id)
@@ -55,11 +75,13 @@ export default function CreateInvoice() {
     }
   }
 
-  // Update batch when date changes
+  // Update batch when date changes (only when creating new)
   useEffect(() => {
-    const batch = getBatchForDate(date)
-    setCurrentBatch(batch)
-  }, [date])
+    if (!isEditMode && date) {
+      const batch = getBatchForDate(date)
+      setCurrentBatch(batch)
+    }
+  }, [date, isEditMode])
   const [customerId, setCustomerId] = useState('')
   const [customerName, setCustomerName] = useState('')
   const [customerAddress, setCustomerAddress] = useState('')
@@ -103,9 +125,9 @@ export default function CreateInvoice() {
   // Populate form with existing invoice data
   useEffect(() => {
     if (isEditMode && selectedInvoice && String(selectedInvoice.id) === String(id)) {
-      setInvoiceNo(selectedInvoice.invoice_no)
+      setInvoiceNo(selectedInvoice.invoice_no || selectedInvoice.batch_invoice_no || '')
       setCurrentBatch(selectedInvoice.batch || '2025-2026')
-      setDate(selectedInvoice.date ? new Date(selectedInvoice.date).toISOString().split('T')[0] : '')
+      setDate(formatDateForInput(selectedInvoice.date))
       setCustomerId(selectedInvoice.customer_id || '')
       setCustomerName(selectedInvoice.customer_name || '')
       setCustomerAddress(selectedInvoice.customer_address || '')
@@ -313,14 +335,24 @@ export default function CreateInvoice() {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Invoice No.</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700">Invoice No.</label>
+                {isEditMode && (
+                  <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Editable</span>
+                )}
+              </div>
               <input
                 type="text"
                 value={invoiceNo}
                 onChange={e => setInvoiceNo(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono font-medium"
+                placeholder="e.g. 042"
               />
-              <p className="text-xs text-gray-500 mt-1">Next available: {invoiceNo}</p>
+              {!isEditMode ? (
+                <p className="text-xs text-gray-500 mt-1">Next available: {invoiceNo}</p>
+              ) : (
+                <p className="text-xs text-blue-600 mt-1">You can edit this invoice number.</p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
@@ -514,7 +546,7 @@ export default function CreateInvoice() {
             onClick={handleSave}
             className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
           >
-            Save Invoice
+            {isEditMode ? "Update Invoice" : "Save Invoice"}
           </button>
           <button
             onClick={() => window.print()}

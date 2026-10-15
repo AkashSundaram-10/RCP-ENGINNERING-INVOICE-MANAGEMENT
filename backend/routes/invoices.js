@@ -247,14 +247,69 @@ router.post('/', async (req, res) => {
 
 // PUT update invoice
 router.put('/:id', async (req, res) => {
-  const { date, customer_id, items, notes, payment_status } = req.body;
+  const { 
+    invoice_no, 
+    batch, 
+    date, 
+    customer_id, 
+    customer_name,
+    customer_address,
+    customer_gstin,
+    customer_phone,
+    items, 
+    notes, 
+    payment_status 
+  } = req.body;
 
   try {
+    const currentInvoice = await getOne('SELECT * FROM invoices WHERE id = $1', [req.params.id]);
+    if (!currentInvoice) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
+    const finalBatch = batch || currentInvoice.batch || await getCurrentBatch();
+
+    let formattedInvoiceNo = currentInvoice.invoice_no;
+    if (invoice_no !== undefined && invoice_no !== null && String(invoice_no).trim() !== '') {
+      formattedInvoiceNo = String(invoice_no).trim();
+      if (/^\d+$/.test(formattedInvoiceNo)) {
+        formattedInvoiceNo = String(parseInt(formattedInvoiceNo, 10)).padStart(3, '0');
+      }
+
+      // Check if invoice_no already exists for a different invoice in this batch
+      const existing = await getOne(
+        'SELECT id FROM invoices WHERE batch = $1 AND (invoice_no = $2 OR batch_invoice_no = $2) AND id != $3',
+        [finalBatch, formattedInvoiceNo, req.params.id]
+      );
+      if (existing) {
+        return res.status(400).json({ 
+          error: `Invoice number ${formattedInvoiceNo} already exists in ${finalBatch}.` 
+        });
+      }
+    }
+
+    let finalCustomerId = customer_id;
+    if (!finalCustomerId && customer_name) {
+      const existingCustomer = await getOne(
+        'SELECT id FROM customers WHERE LOWER(name) = LOWER($1)',
+        [customer_name]
+      );
+      if (existingCustomer) {
+        finalCustomerId = existingCustomer.id;
+      } else {
+        finalCustomerId = await insert(`
+          INSERT INTO customers (name, address, gstin, phone)
+          VALUES ($1, $2, $3, $4)
+          RETURNING id
+        `, [customer_name, customer_address || '', customer_gstin || '', customer_phone || '']);
+      }
+    }
+
     // Calculate totals
     let subtotal = 0;
     if (items && Array.isArray(items)) {
       items.forEach(item => {
-        subtotal += item.qty * item.rate;
+        subtotal += Number(item.qty || 0) * Number(item.rate || 0);
       });
     }
 
@@ -262,20 +317,32 @@ router.put('/:id', async (req, res) => {
     const cgst = subtotal * 0.09;
     const grand_total = subtotal + sgst + cgst;
 
-    // Update invoice
+    // Update invoice with invoice_no, batch, batch_invoice_no, etc.
     await runQuery(`
       UPDATE invoices
-      SET date = $1, customer_id = $2, subtotal = $3, sgst = $4, cgst = $5,
-          grand_total = $6, notes = $7, payment_status = $8
-      WHERE id = $9
-    `, [date, customer_id || null, subtotal, sgst, cgst, grand_total, notes || '', payment_status || 'pending', req.params.id]);
+      SET invoice_no = $1, batch = $2, batch_invoice_no = $1, date = $3, customer_id = $4,
+          subtotal = $5, sgst = $6, cgst = $7, grand_total = $8, notes = $9, payment_status = $10
+      WHERE id = $11
+    `, [
+      formattedInvoiceNo,
+      finalBatch,
+      date || currentInvoice.date,
+      finalCustomerId || null,
+      subtotal,
+      sgst,
+      cgst,
+      grand_total,
+      notes !== undefined ? notes : (currentInvoice.notes || ''),
+      payment_status || currentInvoice.payment_status || 'pending',
+      req.params.id
+    ]);
 
     // Delete old items and insert new ones
     if (items && Array.isArray(items)) {
       await runQuery('DELETE FROM invoice_items WHERE invoice_id = $1', [req.params.id]);
 
       for (const item of items) {
-        const amount = item.qty * item.rate;
+        const amount = Number(item.qty || 0) * Number(item.rate || 0);
         await runQuery(`
           INSERT INTO invoice_items (invoice_id, description, hsn_code, qty, rate, amount)
           VALUES ($1, $2, $3, $4, $5, $6)
@@ -283,8 +350,30 @@ router.put('/:id', async (req, res) => {
       }
     }
 
-    res.json({ message: 'Invoice updated successfully' });
+    const updatedInvoice = await getOne(`
+      SELECT
+        i.*,
+        c.name as customer_name,
+        c.address as customer_address,
+        c.gstin as customer_gstin,
+        c.phone as customer_phone,
+        c.email as customer_email
+      FROM invoices i
+      LEFT JOIN customers c ON i.customer_id = c.id
+      WHERE i.id = $1
+    `, [req.params.id]);
+
+    const updatedItems = await getAll(`
+      SELECT * FROM invoice_items WHERE invoice_id = $1
+    `, [req.params.id]);
+
+    res.json({
+      ...updatedInvoice,
+      items: updatedItems,
+      message: 'Invoice updated successfully'
+    });
   } catch (error) {
+    console.error('Invoice update error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -304,13 +393,46 @@ router.patch('/:id/status', async (req, res) => {
 // DELETE invoice
 router.delete('/:id', async (req, res) => {
   try {
+    const invoiceToDelete = await getOne('SELECT * FROM invoices WHERE id = $1', [req.params.id]);
+    if (!invoiceToDelete) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
+    const { batch, invoice_no } = invoiceToDelete;
+    const deletedNum = parseInt(invoice_no, 10);
+
     // Delete items first (cascade handled by DB but explicit is clearer)
     await runQuery('DELETE FROM invoice_items WHERE invoice_id = $1', [req.params.id]);
     // Delete invoice
     await runQuery('DELETE FROM invoices WHERE id = $1', [req.params.id]);
 
-    res.json({ message: 'Invoice deleted successfully' });
+    // Automatically update subsequent invoice numbers consecutively
+    if (!isNaN(deletedNum)) {
+      const query = batch 
+        ? 'SELECT id, invoice_no, batch_invoice_no FROM invoices WHERE batch = $1 AND CAST(invoice_no AS INTEGER) > $2 ORDER BY CAST(invoice_no AS INTEGER) ASC'
+        : 'SELECT id, invoice_no, batch_invoice_no FROM invoices WHERE (batch IS NULL OR batch = \'\') AND CAST(invoice_no AS INTEGER) > $1 ORDER BY CAST(invoice_no AS INTEGER) ASC';
+      const params = batch ? [batch, deletedNum] : [deletedNum];
+
+      const subsequent = await getAll(query, params);
+
+      for (const inv of subsequent) {
+        const curNum = parseInt(inv.invoice_no, 10);
+        if (!isNaN(curNum)) {
+          const newNum = curNum - 1;
+          const padLen = Math.max(3, (inv.invoice_no || '').length);
+          const newInvoiceNo = String(newNum).padStart(padLen, '0');
+
+          await runQuery(
+            'UPDATE invoices SET invoice_no = $1, batch_invoice_no = $1 WHERE id = $2',
+            [newInvoiceNo, inv.id]
+          );
+        }
+      }
+    }
+
+    res.json({ message: 'Invoice deleted and subsequent invoice numbers updated successfully' });
   } catch (error) {
+    console.error('Invoice delete error:', error);
     res.status(500).json({ error: error.message });
   }
 });
