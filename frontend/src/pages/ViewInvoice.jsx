@@ -7,6 +7,53 @@ import { useUI } from '../contexts/UIContext'
 import { useActionModal } from '../hooks/useActionModal'
 import LoadingSpinner from '../components/LoadingSpinner'
 
+// Format date for display: DD/MM/YYYY (first date/month/year)
+function formatDisplayDate(dateStr) {
+  if (!dateStr) return 'N/A';
+  if (typeof dateStr === 'string' && dateStr.includes('-')) {
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        // YYYY-MM-DD -> DD/MM/YYYY
+        const year = parts[0];
+        const month = parts[1].padStart(2, '0');
+        const day = parts[2].substring(0, 2).padStart(2, '0');
+        return day + '/' + month + '/' + year;
+      } else if (parts[0].length <= 2) {
+        // DD-MM-YYYY -> DD/MM/YYYY
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2].substring(0, 4);
+        return day + '/' + month + '/' + year;
+      }
+    }
+  }
+  if (typeof dateStr === 'string' && dateStr.includes('/')) {
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        const year = parts[0];
+        const month = parts[1].padStart(2, '0');
+        const day = parts[2].substring(0, 2).padStart(2, '0');
+        return day + '/' + month + '/' + year;
+      } else if (parts[0].length <= 2) {
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2].substring(0, 4);
+        return day + '/' + month + '/' + year;
+      }
+    }
+  }
+  const d = new Date(dateStr);
+  if (!isNaN(d.getTime())) {
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return day + '/' + month + '/' + year;
+  }
+  return dateStr;
+}
+
 export default function ViewInvoice() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -101,7 +148,7 @@ export default function ViewInvoice() {
   const invoice = selectedInvoice
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 print:min-h-0 print:bg-white print:p-0 print:m-0">
       {/* Action Bar - Enhanced with glassmorphism effect */}
       <div className="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-200 shadow-sm no-print">
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -165,7 +212,7 @@ export default function ViewInvoice() {
       </div>
 
       {/* Invoice Container - Professional A4 Template */}
-      <div className="invoice-preview-wrapper max-w-4xl mx-auto px-6 py-8">
+      <div className="invoice-preview-wrapper max-w-4xl mx-auto px-6 py-8 print:p-0 print:m-0 print:max-w-none print:w-full">
         <div className="invoice">
           {/* Top Accent Stripe */}
           <div className="top-stripe"></div>
@@ -208,7 +255,7 @@ export default function ViewInvoice() {
             <div className="date-block">
               <div className="date-box">
                 <div className="label">Invoice Date</div>
-                <div className="date-val">{invoice.date}</div>
+                <div className="date-val">{formatDisplayDate(invoice.date)}</div>
               </div>
             </div>
           </div>
@@ -218,12 +265,12 @@ export default function ViewInvoice() {
             <table className="items-table">
               <thead>
                 <tr>
-                  <th style={{width: '30px'}}>#</th>
+                  <th style={{width: '32px'}}>#</th>
                   <th>Description</th>
-                  <th style={{width: '80px'}} className="center">HSN / SAC</th>
+                  <th style={{width: '85px'}} className="center">HSN / SAC</th>
                   <th style={{width: '50px'}} className="center">Qty</th>
-                  <th style={{width: '80px'}} className="right">Rate (₹)</th>
-                  <th style={{width: '90px'}} className="right">Amount (₹)</th>
+                  <th style={{width: '85px'}} className="right">Rate (₹)</th>
+                  <th style={{width: '95px'}} className="right">Amount (₹)</th>
                 </tr>
               </thead>
               <tbody>
@@ -231,12 +278,12 @@ export default function ViewInvoice() {
                   const amount = (parseFloat(item.qty) || 0) * (parseFloat(item.rate) || 0)
                   return (
                     <tr key={idx}>
-                      <td className="center">{idx + 1}</td>
-                      <td>{item.description}</td>
-                      <td className="center">{item.hsn_code}</td>
-                      <td className="center">{item.qty}</td>
-                      <td className="right">{parseFloat(item.rate).toFixed(2)}</td>
-                      <td className="right">{amount.toFixed(2)}</td>
+                      <td className="center item-no">{idx + 1}</td>
+                      <td className="item-description">{item.description}</td>
+                      <td className="center item-hsn">{item.hsn_code}</td>
+                      <td className="center item-qty">{item.qty}</td>
+                      <td className="right item-rate">{parseFloat(item.rate).toFixed(2)}</td>
+                      <td className="right item-amount">{amount.toFixed(2)}</td>
                     </tr>
                   )
                 })}

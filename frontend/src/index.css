@@ -33,6 +33,7 @@ html {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
+    box-sizing: border-box !important;
   }
 
   html, body {
@@ -40,17 +41,34 @@ html {
     padding: 0 !important;
     width: 210mm !important;
     height: 297mm !important;
+    max-height: 297mm !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+  }
+
+  #root,
+  .min-h-screen,
+  main,
+  .invoice-preview-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: 297mm !important;
+    height: 297mm !important;
+    max-height: 297mm !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
     overflow: hidden !important;
   }
 
-  .no-print {
-    display: none !important;
-  }
-
-  /* Hide navigation, buttons, and forms */
+  .no-print,
   button,
   nav,
-  header {
+  header,
+  .toast,
+  .modal {
     display: none !important;
   }
 
@@ -61,27 +79,28 @@ html {
 
   .print-invoice-page {
     display: block !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* Invoice preview wrapper */
-  .invoice-preview-wrapper {
-    position: static !important;
-    margin: 0 !important;
-    padding: 0 !important;
     width: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* Invoice container */
   .invoice {
     width: 210mm !important;
-    height: 297mm !important;
-    max-height: 297mm !important;
+    max-width: 210mm !important;
+    height: 296mm !important;
+    min-height: 296mm !important;
+    max-height: 296mm !important;
     margin: 0 !important;
+    padding: 0 !important;
     box-shadow: none !important;
+    border: none !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
     page-break-inside: avoid !important;
+    page-break-after: avoid !important;
     overflow: hidden !important;
   }
 

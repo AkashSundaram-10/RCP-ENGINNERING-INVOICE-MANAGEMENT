@@ -93,7 +93,7 @@ export default function Layout({ children }) {
       </nav>
 
       {/* Main Content - Full Width */}
-      <main className="w-full px-8 py-6">
+      <main className="w-full px-8 py-6 print:p-0 print:m-0 print:w-full print:max-w-none">
         {children}
       </main>
 

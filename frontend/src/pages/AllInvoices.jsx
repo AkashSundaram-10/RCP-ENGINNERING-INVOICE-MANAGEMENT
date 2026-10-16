@@ -17,11 +17,49 @@ function parseDate(dateStr) {
   return new Date(dateStr)
 }
 
-// Format date for display
+// Format date for display: DD/MM/YYYY (first date/month/year)
 function formatDate(dateStr) {
-  const date = parseDate(dateStr)
-  if (!date || isNaN(date.getTime())) return dateStr || 'N/A'
-  return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+  if (!dateStr) return 'N/A';
+  if (typeof dateStr === 'string' && dateStr.includes('-')) {
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        // YYYY-MM-DD -> DD/MM/YYYY
+        const year = parts[0];
+        const month = parts[1].padStart(2, '0');
+        const day = parts[2].substring(0, 2).padStart(2, '0');
+        return day + '/' + month + '/' + year;
+      } else if (parts[0].length <= 2) {
+        // DD-MM-YYYY -> DD/MM/YYYY
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2].substring(0, 4);
+        return day + '/' + month + '/' + year;
+      }
+    }
+  }
+  if (typeof dateStr === 'string' && dateStr.includes('/')) {
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        const year = parts[0];
+        const month = parts[1].padStart(2, '0');
+        const day = parts[2].substring(0, 2).padStart(2, '0');
+        return day + '/' + month + '/' + year;
+      } else if (parts[0].length <= 2) {
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2].substring(0, 4);
+        return day + '/' + month + '/' + year;
+      }
+    }
+  }
+  const date = parseDate(dateStr);
+  if (!date || isNaN(date.getTime())) return dateStr || 'N/A';
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return day + '/' + month + '/' + year;
 }
 
 // Normalize batch names to only 2025-2026 or 2026-2027

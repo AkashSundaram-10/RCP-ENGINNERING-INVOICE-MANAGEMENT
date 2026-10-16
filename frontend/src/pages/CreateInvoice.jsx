@@ -6,6 +6,53 @@ import './InvoiceTemplate.css'
 import { useUI } from '../contexts/UIContext'
 import { useActionModal } from '../hooks/useActionModal'
 
+// Format date for display: DD/MM/YYYY (first date/month/year)
+function formatDisplayDate(dateStr) {
+  if (!dateStr) return 'N/A';
+  if (typeof dateStr === 'string' && dateStr.includes('-')) {
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        // YYYY-MM-DD -> DD/MM/YYYY
+        const year = parts[0];
+        const month = parts[1].padStart(2, '0');
+        const day = parts[2].substring(0, 2).padStart(2, '0');
+        return day + '/' + month + '/' + year;
+      } else if (parts[0].length <= 2) {
+        // DD-MM-YYYY -> DD/MM/YYYY
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2].substring(0, 4);
+        return day + '/' + month + '/' + year;
+      }
+    }
+  }
+  if (typeof dateStr === 'string' && dateStr.includes('/')) {
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        const year = parts[0];
+        const month = parts[1].padStart(2, '0');
+        const day = parts[2].substring(0, 2).padStart(2, '0');
+        return day + '/' + month + '/' + year;
+      } else if (parts[0].length <= 2) {
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2].substring(0, 4);
+        return day + '/' + month + '/' + year;
+      }
+    }
+  }
+  const d = new Date(dateStr);
+  if (!isNaN(d.getTime())) {
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return day + '/' + month + '/' + year;
+  }
+  return dateStr;
+}
+
 // Helper to format date string to YYYY-MM-DD for date input
 function formatDateForInput(dateStr) {
   if (!dateStr) return '';
@@ -572,7 +619,7 @@ export default function CreateInvoice() {
       </div>
 
       {/* Preview Section (Right) - Professional A4 Template */}
-      <div className="invoice-preview-wrapper sticky top-20">
+      <div className="invoice-preview-wrapper sticky top-20 print:static print:p-0 print:m-0 print:w-full print:max-w-none">
         <div className="invoice">
           {/* Top Accent Stripe */}
           <div className="top-stripe"></div>
@@ -615,7 +662,7 @@ export default function CreateInvoice() {
             <div className="date-block">
               <div className="date-box">
                 <div className="label">Invoice Date</div>
-                <div className="date-val">{new Date(date).toLocaleDateString('en-IN')}</div>
+                <div className="date-val">{formatDisplayDate(date)}</div>
               </div>
             </div>
           </div>
@@ -625,12 +672,12 @@ export default function CreateInvoice() {
             <table className="items-table">
               <thead>
                 <tr>
-                  <th style={{width: '30px'}}>#</th>
+                  <th style={{width: '32px'}}>#</th>
                   <th>Description</th>
-                  <th style={{width: '80px'}} className="center">HSN / SAC</th>
+                  <th style={{width: '85px'}} className="center">HSN / SAC</th>
                   <th style={{width: '50px'}} className="center">Qty</th>
-                  <th style={{width: '80px'}} className="right">Rate (₹)</th>
-                  <th style={{width: '90px'}} className="right">Amount (₹)</th>
+                  <th style={{width: '85px'}} className="right">Rate (₹)</th>
+                  <th style={{width: '95px'}} className="right">Amount (₹)</th>
                 </tr>
               </thead>
               <tbody>
@@ -638,12 +685,12 @@ export default function CreateInvoice() {
                   const amount = (parseFloat(item.qty) || 0) * (parseFloat(item.rate) || 0)
                   return (
                     <tr key={idx}>
-                      <td className="center">{idx + 1}</td>
-                      <td>{item.description || '—'}</td>
-                      <td className="center">{item.hsn_code}</td>
-                      <td className="center">{item.qty}</td>
-                      <td className="right">{parseFloat(item.rate || 0).toFixed(2)}</td>
-                      <td className="right">{amount.toFixed(2)}</td>
+                      <td className="center item-no">{idx + 1}</td>
+                      <td className="item-description">{item.description || '—'}</td>
+                      <td className="center item-hsn">{item.hsn_code}</td>
+                      <td className="center item-qty">{item.qty}</td>
+                      <td className="right item-rate">{parseFloat(item.rate || 0).toFixed(2)}</td>
+                      <td className="right item-amount">{amount.toFixed(2)}</td>
                     </tr>
                   )
                 })}
